@@ -1,116 +1,227 @@
-import { TrendingDownIcon, TrendingUpIcon } from 'lucide-react';
+'use client';
 
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { UserCog, Info, Dumbbell, Target, Weight, Flame } from 'lucide-react';
+import { getUserProfileAndGoals } from '@/lib/actions/user.action';
+import { Skeleton } from '@/components/ui/skeleton';
+import { formatDistanceToNow } from 'date-fns';
+import { FitnessGoal, DifficultyLevel } from '@prisma/client';
+
+// Define types for the user data
+type UserProfileData = {
+  age: number | null;
+  weight: number | null;
+  height: number | null;
+  bodyFatPercentage: number | null;
+  dietaryPreferences: string[];
+  fitnessLevel: DifficultyLevel | null;
+  targetWeight: number | null;
+};
+
+type UserStatsData = {
+  workoutsThisWeek: number;
+  activeChallenges: number;
+  latestWeightLog: { value: number; loggedAt: Date } | null;
+};
+
+type UserData = {
+  goals: FitnessGoal[];
+  profile: UserProfileData | null;
+  stats: UserStatsData;
+} | null;
+
+// Calculate maintenance calories using Mifflin-St Jeor formula
+const calculateMaintenanceCalories = (weight: number, height: number, age: number, isMale: boolean) => {
+  // Mifflin-St Jeor Equation
+  const bmr = (10 * weight) + (6.25 * height) - (5 * age) + (isMale ? 5 : -161);
+  
+  // Apply activity factor (using moderate activity as default)
+  return Math.round(bmr * 1.55);
+};
 
 export function SectionCards() {
+  const [userData, setUserData] = useState<UserData>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await getUserProfileAndGoals();
+        setUserData(data);
+      } catch (err) {
+        console.error("Failed to fetch user data:", err);
+        setError("Could not load user data.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const profile = userData?.profile;
+  const goals = userData?.goals;
+  const stats = userData?.stats;
+  const primaryGoal = goals && goals.length > 0 ? goals[0] : null;
+
+  // Calculate maintenance calories if we have the required data
+  const maintenanceCalories = profile?.weight && profile?.height && profile?.age 
+    ? calculateMaintenanceCalories(profile.weight, profile.height, profile.age, true) // Assuming male for now
+    : null;
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, index) => (
+          <Card key={index}>
+            <CardHeader>
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-8 w-3/4 mt-1" />
+            </CardHeader>
+            <CardFooter>
+              <Skeleton className="h-4 w-full" />
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="px-4 lg:px-6 text-destructive">
+        Error loading dashboard cards: {error}
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="grid 
-      grid-cols-1
-      gap-4 
-      px-4 
-      lg:px-6
-      md:grid-cols-2
-      lg:grid-cols-4
-      overflow-hidden 
-      overflow-x-auto
-      *:data-[slot=card]:shadow-xs 
-      *:data-[slot=card]:bg-gradient-to-t 
-      *:data-[slot=card]:from-primary/5 
-      *:data-[slot=card]:to-card 
-      dark:*:data-[slot=card]:bg-card"
-    >
-      <Card className="@container/card">
-        <CardHeader className="relative">
-          <CardDescription>Total Revenue</CardDescription>
-          <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-            $1,250.00
-          </CardTitle>
-          <div className="absolute right-4 top-4">
-            <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
-              <TrendingUpIcon className="size-3" />
-              +12.5%
-            </Badge>
+    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* Body Info Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <UserCog className="h-4 w-4" />
+            Current Body Info
           </div>
+          {profile ? (
+            <CardTitle>
+              {profile.weight ? `${profile.weight} kg` : '-'} / {profile.height ? `${profile.height} cm` : '-'}
+            </CardTitle>
+          ) : (
+            <CardTitle>Add Your Info</CardTitle>
+          )}
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month <TrendingUpIcon className="size-4" />
+        <CardFooter>
+          {profile ? (
+            <div className="text-sm">
+              <div>Primary Goal: {primaryGoal?.replace(/_/g, ' ').toLowerCase()}</div>
+              <div className="text-muted-foreground">Keep your profile updated!</div>
+            </div>
+          ) : (
+            <div className="text-sm">
+              <div>Click 'Body Info +' to add details</div>
+            </div>
+          )}
+        </CardFooter>
+      </Card>
+
+      {/* Maintenance Calories Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Flame className="h-4 w-4" />
+            Maintenance Calories
           </div>
-          <div className="text-muted-foreground">
-            Visitors for the last 6 months
+          <CardTitle>
+            {maintenanceCalories ? `${maintenanceCalories} kcal` : '-'}
+          </CardTitle>
+        </CardHeader>
+        <CardFooter>
+          <div className="text-sm">
+            {maintenanceCalories ? (
+              <>
+                <div>Estimated daily needs</div>
+                <div className="text-muted-foreground">Based on your body metrics</div>
+              </>
+            ) : (
+              <div>Complete your body info to calculate</div>
+            )}
           </div>
         </CardFooter>
       </Card>
-      <Card className="@container/card">
-        <CardHeader className="relative">
-          <CardDescription>New Customers</CardDescription>
-          <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-            1,234
-          </CardTitle>
-          <div className="absolute right-4 top-4">
-            <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
-              <TrendingDownIcon className="size-3" />
-              -20%
-            </Badge>
+
+      {/* Workouts This Week Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Dumbbell className="h-4 w-4" />
+            Workouts This Week
           </div>
+          <CardTitle>{stats?.workoutsThisWeek ?? 0}</CardTitle>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period <TrendingDownIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Acquisition needs attention
+        <CardFooter>
+          <div className="text-sm">
+            {stats && stats.workoutsThisWeek > 0 ? 'Great consistency!' : 'Log your first workout!'}
           </div>
         </CardFooter>
       </Card>
-      <Card className="@container/card">
-        <CardHeader className="relative">
-          <CardDescription>Active Accounts</CardDescription>
-          <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-            45,678
+
+      {/* Latest Weight Log Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Weight className="h-4 w-4" />
+            Latest Weight
+          </div>
+          <CardTitle>
+            {stats?.latestWeightLog?.value ? `${stats.latestWeightLog.value} kg` : '-'}
           </CardTitle>
-          <div className="absolute right-4 top-4">
-            <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
-              <TrendingUpIcon className="size-3" />
-              +12.5%
-            </Badge>
-          </div>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention <TrendingUpIcon className="size-4" />
+        <CardFooter>
+          <div className="text-sm">
+            {stats?.latestWeightLog ? 
+              `Logged ${formatDistanceToNow(new Date(stats.latestWeightLog.loggedAt), { addSuffix: true })}` : 
+              'No weight logged yet'}
           </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader className="relative">
-          <CardDescription>Growth Rate</CardDescription>
-          <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-            4.5%
-          </CardTitle>
-          <div className="absolute right-4 top-4">
-            <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
-              <TrendingUpIcon className="size-3" />
-              +4.5%
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance <TrendingUpIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
         </CardFooter>
       </Card>
     </div>
   );
+}
+
+// Card components with proper TypeScript types
+interface CardProps {
+  children: React.ReactNode;
+}
+
+function Card({ children }: CardProps) {
+  return <div className="border rounded-lg p-4">{children}</div>;
+}
+
+interface CardHeaderProps {
+  children: React.ReactNode;
+}
+
+function CardHeader({ children }: CardHeaderProps) {
+  return <div className="mb-4">{children}</div>;
+}
+
+interface CardTitleProps {
+  children: React.ReactNode;
+}
+
+function CardTitle({ children }: CardTitleProps) {
+  return <h3 className="text-xl font-semibold">{children}</h3>;
+}
+
+interface CardFooterProps {
+  children: React.ReactNode;
+}
+
+function CardFooter({ children }: CardFooterProps) {
+  return <div className="mt-4">{children}</div>;
 }

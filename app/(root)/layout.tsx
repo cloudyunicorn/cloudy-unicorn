@@ -7,7 +7,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col h-screen mx-auto">
+    // Add overflow-x-hidden here
+    <div className="flex flex-col h-screen mx-auto overflow-x-hidden">
       <Header />
       {children}
       <Footer />

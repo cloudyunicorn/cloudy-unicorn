@@ -55,6 +55,13 @@ model User {
   @@index([email, createdAt])
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
 model UserProfile {
   id               String    @id @default(uuid())
   user             User      @relation(fields: [userId], references: [id])
@@ -63,7 +70,7 @@ model UserProfile {
   weight           Float?
   height           Float?
   bodyFatPercentage Float?
-  maintenanceCalories Int?
+  gender           Gender?
   dietaryPreferences String[]
   fitnessLevel     DifficultyLevel?
   targetWeight     Float?
