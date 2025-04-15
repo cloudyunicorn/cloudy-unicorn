@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { UserCog, Info, Dumbbell, Target, Weight, Flame } from 'lucide-react';
 import { getUserProfileAndGoals } from '@/lib/actions/user.action';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Spinner } from '@/components/ui/spinner';
 import { formatDistanceToNow } from 'date-fns';
 import { FitnessGoal, DifficultyLevel } from '@prisma/client';
+import { BodyInfoDialog } from "./body-info-dialog";
 
 // Define types for the user data
 type UserProfileData = {
@@ -72,23 +73,6 @@ export function SectionCards() {
     ? calculateMaintenanceCalories(profile.weight, profile.height, profile.age, true) // Assuming male for now
     : null;
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 md:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-8 w-3/4 mt-1" />
-            </CardHeader>
-            <CardFooter>
-              <Skeleton className="h-4 w-full" />
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -107,7 +91,11 @@ export function SectionCards() {
             <UserCog className="h-4 w-4" />
             Current Body Info
           </div>
-          {profile ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center h-8">
+              <Spinner className="h-4 w-4" />
+            </div>
+          ) : profile ? (
             <CardTitle>
               {profile.weight ? `${profile.weight} kg` : '-'} / {profile.height ? `${profile.height} cm` : '-'}
             </CardTitle>
@@ -123,7 +111,7 @@ export function SectionCards() {
             </div>
           ) : (
             <div className="text-sm">
-              <div>Click 'Body Info +' to add details</div>
+              <div>Click <BodyInfoDialog /> to add details</div>
             </div>
           )}
         </CardFooter>
@@ -136,9 +124,15 @@ export function SectionCards() {
             <Flame className="h-4 w-4" />
             Maintenance Calories
           </div>
-          <CardTitle>
-            {maintenanceCalories ? `${maintenanceCalories} kcal` : '-'}
-          </CardTitle>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-8">
+              <Spinner className="h-4 w-4" />
+            </div>
+          ) : (
+            <CardTitle>
+              {maintenanceCalories ? `${maintenanceCalories} kcal` : '-'}
+            </CardTitle>
+          )}
         </CardHeader>
         <CardFooter>
           <div className="text-sm">
@@ -161,7 +155,13 @@ export function SectionCards() {
             <Dumbbell className="h-4 w-4" />
             Workouts This Week
           </div>
-          <CardTitle>{stats?.workoutsThisWeek ?? 0}</CardTitle>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-8">
+              <Spinner className="h-4 w-4" />
+            </div>
+          ) : (
+            <CardTitle>{stats?.workoutsThisWeek ?? 0}</CardTitle>
+          )}
         </CardHeader>
         <CardFooter>
           <div className="text-sm">
@@ -177,9 +177,15 @@ export function SectionCards() {
             <Weight className="h-4 w-4" />
             Latest Weight
           </div>
-          <CardTitle>
-            {stats?.latestWeightLog?.value ? `${stats.latestWeightLog.value} kg` : '-'}
-          </CardTitle>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-8">
+              <Spinner className="h-4 w-4" />
+            </div>
+          ) : (
+            <CardTitle>
+              {stats?.latestWeightLog?.value ? `${stats.latestWeightLog.value} kg` : '-'}
+            </CardTitle>
+          )}
         </CardHeader>
         <CardFooter>
           <div className="text-sm">

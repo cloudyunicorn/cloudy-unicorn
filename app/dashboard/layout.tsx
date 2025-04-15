@@ -4,6 +4,7 @@ import { AppSidebar, data } from '@/components/sidebar/AppSidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import React, { useState } from 'react';
 import { DashboardHeader } from "./dashboard-header";
+import MobileNavbar from '@/components/sidebar/MobileNavbar';
 
 const defaultItem = data.navMain.find((item) => item.title === 'Dashboard');
 
@@ -43,6 +44,10 @@ export default function DashboardLayout({
           </div>
         </div>
       </SidebarInset>
+      <MobileNavbar 
+        activeItem={activeItem}
+        onSelectComponent={handleSelectComponent}
+      />
     </SidebarProvider>
   );
 }

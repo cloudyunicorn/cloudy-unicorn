@@ -10,6 +10,7 @@ import { SignInForm } from "./signInForm";
 import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/providers/supabase-provider";
 import { Session } from "@supabase/supabase-js";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SignInPage() {
   const supabase = useSupabase();
@@ -32,7 +33,11 @@ export default function SignInPage() {
   }, [supabase, router]);
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
   }
 
   return (

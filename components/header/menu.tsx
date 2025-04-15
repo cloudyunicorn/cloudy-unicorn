@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Modetoggle from './mode-toggle';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { AlignJustify, UserPen } from 'lucide-react';
+import { AlignJustify, UserPen, Loader2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -19,6 +19,7 @@ import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 const Menu = () => {
   const supabase = useSupabase();
   const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function getSession() {
@@ -34,6 +35,7 @@ const Menu = () => {
         } else {
           setSession(session);
         }
+        setIsLoading(false); // Reset loading state on auth changes
       }
     );
 
@@ -47,8 +49,14 @@ const Menu = () => {
       <nav className="hidden md:flex w-full max-w-xs gap-1">
         {!session && (
           <>
-            <Button asChild variant="ghost">
-              <Link href="/sign-in">Sign In</Link>
+            <Button asChild variant="ghost" disabled={isLoading}>
+              <Link href="/sign-in" onClick={() => setIsLoading(true)}>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  'Sign In'
+                )}
+              </Link>
             </Button>
             <Button asChild variant="ghost">
               <Link href="/sign-up">Sign Up</Link>
@@ -68,8 +76,14 @@ const Menu = () => {
             <SheetTitle>Menu</SheetTitle>
             {!session && (
               <>
-                <Button asChild variant="ghost">
-                  <Link href="/sign-in">Sign In</Link>
+                <Button asChild variant="ghost" disabled={isLoading}>
+                  <Link href="/sign-in" onClick={() => setIsLoading(true)}>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      'Sign In'
+                    )}
+                  </Link>
                 </Button>
                 <Button asChild variant="ghost">
                   <Link href="/sign-up">Sign Up</Link>

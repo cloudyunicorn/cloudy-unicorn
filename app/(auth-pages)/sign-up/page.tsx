@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert } from '@/components/ui/alert';
@@ -8,10 +8,38 @@ import { Button } from "@/components/ui/button";
 import { SignUpForm } from "./signUpForm";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import { useSupabase } from "@/providers/supabase-provider";
+import { Session } from "@supabase/supabase-js";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SignUpPage() {
+  const supabase = useSupabase();
+  const router = useRouter();
   const [errorMsg, setErrorMsg] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // On mount, check if user is already signed in
+    supabase.auth.getSession().then(
+      ({ data }: { data: { session: Session | null } }) => {
+        if (data.session) {
+          // User already has a valid session, redirect
+          router.push('/dashboard');
+        } else {
+          setLoading(false)
+        }
+      }
+    );
+  }, [supabase, router]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md mx-auto p-4 bg-background">
@@ -41,7 +69,10 @@ export default function SignUpPage() {
         )}
 
         <SignUpForm
-          onSuccess={() => setMessage('Sign up successful! Check your email for a confirmation link.')}
+          onSuccess={() => {
+            setMessage('Sign up successful! Redirecting to dashboard...');
+            router.push('/dashboard');
+          }}
           onError={(message) => setErrorMsg(message)}
         />
 

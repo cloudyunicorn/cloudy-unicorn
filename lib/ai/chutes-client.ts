@@ -3,11 +3,11 @@ import { FitnessContext, ChutesAPIResponse, APIError } from '@/lib/ai/types';
 const API_TIMEOUT = 60000; // 30 seconds
 const MAX_RETRIES = 2;
 
-export async function getFitnessResponse(
+export async function* getFitnessResponse(
   userMessage: string,
   context: FitnessContext,
   retries = MAX_RETRIES
-): Promise<string> {
+): AsyncGenerator<string, void, unknown> {
   const controller = new AbortController();
   let timeoutId: NodeJS.Timeout | null = null;
   let response: Response;
@@ -40,7 +40,7 @@ export async function getFitnessResponse(
             content: userMessage
           }
         ],
-        stream: false,
+        stream: true,
         max_tokens: 5120,
         temperature: 0.7
       }),
@@ -54,20 +54,43 @@ export async function getFitnessResponse(
       );
     }
 
-    const data: ChutesAPIResponse = await response.json();
-    
-    if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Invalid API response structure');
-    }
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error('Failed to get response reader');
 
-    return data.choices[0].message.content;
+    const decoder = new TextDecoder();
+    let buffer = '';
+    
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      buffer += chunk;
+
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (line.startsWith('data: ') && !line.includes('[DONE]')) {
+          try {
+            const data = JSON.parse(line.substring(6));
+            if (data.choices?.[0]?.delta?.content) {
+              yield data.choices[0].delta.content;
+            }
+          } catch (e) {
+            console.error('Error parsing stream data:', e);
+          }
+        }
+      }
+    }
 
   } catch (error) {
     if (retries > 0 && 
         (error instanceof TypeError || // Network errors
          (error instanceof Error && error.name === 'AbortError') || // Timeout
          (error instanceof Error && error.message.includes('500')))) { // Server errors
-      return getFitnessResponse(userMessage, context, retries - 1);
+      yield* getFitnessResponse(userMessage, context, retries - 1);
+      return;
     }
     throw new Error(`Failed to get fitness response: ${
       error instanceof Error ? error.message : 'Unknown error'

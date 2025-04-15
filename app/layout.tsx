@@ -23,6 +23,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <html lang="en" className={`${geistSans.className} antialiased`} suppressHydrationWarning>
       <SupabaseProvider>
@@ -33,9 +34,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <main>
-                {children}
-            </main>
+            <main>{children}</main>
           </ThemeProvider>
         </body>
       </SupabaseProvider>

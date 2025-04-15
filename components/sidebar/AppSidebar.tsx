@@ -37,7 +37,7 @@ import Habits from "../habits";
 import HealthAssessments from "../health-assessments.tsx";
 import ProgressTrack from "../progress-track";
 
-interface NavItem {
+export interface NavItem {
   title: string;
   url?: string;
   component?: React.ComponentType;

@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import { useState } from 'react';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -29,6 +31,7 @@ interface SignUpFormProps {
 
 export function SignUpForm({ onSuccess, onError }: SignUpFormProps) {
   const supabase = useSupabase();
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,11 +41,16 @@ export function SignUpForm({ onSuccess, onError }: SignUpFormProps) {
   });
 
   async function onSubmit(values: FormValues) {
-    const { error } = await supabase.auth.signUp(values);
-    if (error) {
-      onError(error.message);
-    } else {
-      onSuccess();
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signUp(values);
+      if (error) {
+        onError(error.message);
+      } else {
+        onSuccess();
+      }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -84,8 +92,15 @@ export function SignUpForm({ onSuccess, onError }: SignUpFormProps) {
           )}
         />
 
-        <Button type="submit" className="w-full">
-          Create Account
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2">
+              <Spinner size="sm" />
+              Creating Account...
+            </div>
+          ) : (
+            'Create Account'
+          )}
         </Button>
       </form>
     </Form>
