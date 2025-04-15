@@ -7,6 +7,14 @@ export interface FitnessContext {
     workouts: string[];
     meals?: string[];
   };
+  bodyMetrics?: {
+    age?: number;
+    weight?: number;
+    height?: number;
+    bodyFatPercentage?: number;
+    gender?: string;
+    targetWeight?: number;
+  };
 }
 
 export interface FitnessResponse {

@@ -1,6 +1,6 @@
 import { FitnessContext, ChutesAPIResponse, APIError } from '@/lib/ai/types';
 
-const API_TIMEOUT = 30000; // 30 seconds
+const API_TIMEOUT = 60000; // 30 seconds
 const MAX_RETRIES = 2;
 
 export async function getFitnessResponse(
@@ -41,7 +41,7 @@ export async function getFitnessResponse(
           }
         ],
         stream: false,
-        max_tokens: 512,
+        max_tokens: 5120,
         temperature: 0.7
       }),
       signal: controller.signal

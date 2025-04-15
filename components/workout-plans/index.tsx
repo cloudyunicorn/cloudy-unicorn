@@ -1,4 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 import { getFitnessResponse } from '@/lib/ai/chutes-client'
 import { getWorkoutPrompt } from '@/lib/ai/fitness-prompts'
 import { Input } from '@/components/ui/input'
@@ -7,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+import { getUserProfileAndGoals } from '@/lib/actions/user.action'
 
 const WorkoutPlans = () => {
   const [query, setQuery] = useState('')
@@ -18,8 +22,34 @@ const WorkoutPlans = () => {
     healthConditions: [],
     currentPlan: {
       workouts: ['bodyweight']
-    }
+    },
+    bodyMetrics: {}
   })
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await getUserProfileAndGoals()
+        if (userData?.profile) {
+          const profile = userData.profile
+          setContext(prev => ({
+            ...prev,
+            fitnessLevel: profile.fitnessLevel?.toLowerCase() || 'beginner',
+            bodyMetrics: {
+              age: profile.age ?? undefined,
+              weight: profile.weight ?? undefined,
+              height: profile.height ?? undefined,
+              bodyFatPercentage: profile.bodyFatPercentage ?? undefined,
+              gender: profile.gender ?? undefined
+            }
+          }))
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+      }
+    }
+    fetchUserData()
+  }, [])
 
   const handleGetWorkout = async () => {
     setIsLoading(true)
@@ -99,9 +129,25 @@ const WorkoutPlans = () => {
             <CardHeader>
               <CardTitle className="text-lg">Suggested Workout</CardTitle>
             </CardHeader>
-            <CardContent className="whitespace-pre-wrap p-6">
-              {workoutPlan}
-            </CardContent>
+          <CardContent className="p-6">
+            <div className="prose prose-sm max-w-none">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
+                components={{
+                  h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-6 mb-3" {...props} />,
+                  p: ({node, ...props}) => <p className="mb-4" {...props} />,
+                  ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-4" {...props} />,
+                  li: ({node, ...props}) => <li className="mb-1" {...props} />,
+                  strong: ({node, ...props}) => <span className="font-semibold" {...props} />,
+                  em: ({node, ...props}) => <span className="italic" {...props} />,
+                  hr: ({node, ...props}) => <hr className="my-4 border-gray-200" {...props} />
+                }}
+              >
+                {workoutPlan}
+              </ReactMarkdown>
+            </div>
+          </CardContent>
           </Card>
         )}
       </CardContent>
