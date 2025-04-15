@@ -1,4 +1,7 @@
-import NextLogo from "../next-logo";
+"use client"
+
+import Link from 'next/link';
+import Logo from '../Logo';
 import Menu from './menu';
 
 const Header = () => {
@@ -10,7 +13,9 @@ const Header = () => {
       {/* Content container */}
       <div className="relative flex justify-between items-center">
         <div className="p-5">
-          <NextLogo />
+          <Link href="/">
+            <Logo />
+          </Link>
         </div>
         <div className="pr-5">
           <Menu />

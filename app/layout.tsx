@@ -2,8 +2,6 @@ import { Geist } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import './globals.css';
 import { SupabaseProvider } from '@/providers/supabase-provider';
-import Footer from '@/components/Footer';
-import Header from "@/components/header";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -11,8 +9,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'Next.js and Supabase Starter Kit',
-  description: 'The fastest way to build apps with Next.js and Supabase',
+  title: 'CyberSculpt',
+  description: 'The fastest way to grow your social media engagement.',
 };
 
 const geistSans = Geist({
@@ -26,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={geistSans.className} suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.className} antialiased`} suppressHydrationWarning>
       <SupabaseProvider>
         <body>
           <ThemeProvider
@@ -35,13 +33,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex flex-col min-h-screen max-w-7xl mx-auto">
-              <Header />
-              <main className="flex-1">
+            <main>
                 {children}
-              </main>
-              <Footer />
-            </div>
+            </main>
           </ThemeProvider>
         </body>
       </SupabaseProvider>

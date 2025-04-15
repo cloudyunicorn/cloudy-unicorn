@@ -10,54 +10,196 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url       = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
+enum FitnessGoal {
+  WEIGHT_LOSS
+  MUSCLE_GAIN
+  MAINTENANCE
+  ENDURANCE
+  FLEXIBILITY
+}
+
+enum DifficultyLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ChallengeType {
+  NUTRITION
+  FITNESS
+  MINDFULNESS
+  HYDRATION
+}
+
 model User {
-  id             String            @id @default(cuid())
-  email          String            @unique
-  createdAt      DateTime          @default(now())
-  socialAccounts SocialAccount[]
-  calendars      ContentCalendar[]
-  analyses       TrendAnalysis[]
+  id              String             @id @default(uuid())
+  email           String             @unique
+  name            String?
+  authId          String             @unique @map("auth_id")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+  profile         UserProfile?
+  mealPlans       MealPlan[]
+  workoutPrograms WorkoutProgram[]
+  challenges      UserChallenge[]
+  progressLogs    ProgressLog[]
+  bodyMeasurements BodyMeasurement[]
+  healthAssessments AIHealthAssessment[]
+  workoutSessions WorkoutSession[]
+  goals           FitnessGoal[]     @default([])
+
+  @@index([email, createdAt])
 }
 
-model SocialAccount {
-  id          String          @id @default(cuid())
-  platform    String // 'twitter', 'instagram', etc.
-  accessToken String
-  userId      String
-  user        User            @relation(fields: [userId], references: [id])
-  posts       ScheduledPost[]
+model UserProfile {
+  id               String    @id @default(uuid())
+  user             User      @relation(fields: [userId], references: [id])
+  userId           String    @unique
+  age              Int?
+  weight           Float?
+  height           Float?
+  bodyFatPercentage Float?
+  maintenanceCalories Int?
+  dietaryPreferences String[]
+  fitnessLevel     DifficultyLevel?
+  targetWeight     Float?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  
+  @@index([userId, age])
 }
 
-model ContentCalendar {
-  id     String          @id @default(cuid())
-  name   String
-  userId String
-  user   User            @relation(fields: [userId], references: [id])
-  posts  ScheduledPost[]
+model MealPlan {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  title        String
+  description  String?
+  days         Json       // Structured as { day: 1, meals: [...] }
+  caloriesPerDay Int
+  dietaryTags  String[]   // e.g., ["vegetarian", "high-protein"]
+  isActive     Boolean    @default(false)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  @@index([userId, createdAt])
 }
 
-model ScheduledPost {
-  id          String          @id @default(cuid())
-  content     String
-  mediaUrl    String?
-  scheduledAt DateTime
-  status      String          @default("scheduled") // scheduled/published/failed
-  platform    String
-  calendarId  String
-  calendar    ContentCalendar @relation(fields: [calendarId], references: [id])
-  accountId   String
-  account     SocialAccount   @relation(fields: [accountId], references: [id])
+model Exercise {
+  id           String     @id @default(uuid())
+  name         String
+  description  String
+  equipment    String[]
+  muscleGroup  String[]
+  difficulty   DifficultyLevel
+  createdAt    DateTime   @default(now()) @map("created_at")
+  
+  workoutPrograms WorkoutProgram[]
+
+  @@index([name, muscleGroup])
 }
 
-model TrendAnalysis {
-  id        String   @id @default(cuid())
-  keywords  String[]
-  insights  Json // Stores AI-generated analysis
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+model WorkoutProgram {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  title        String
+  description  String
+  durationWeeks Int
+  daysPerWeek  Int
+  exercises    Exercise[]
+  difficulty   DifficultyLevel
+  createdAt    DateTime   @default(now()) @map("created_at")
+  sessions     WorkoutSession[]
+
+  @@index([userId, difficulty])
+}
+
+model WorkoutSession {
+  id           String     @id @default(uuid())
+  program      WorkoutProgram @relation(fields: [programId], references: [id])
+  programId    String
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  date         DateTime
+  duration     Int        // in minutes
+  completed    Boolean    @default(false)
+  notes        String?
+  exercisesLogged Json    // Tracked exercises with sets/reps/weight
+
+  @@index([userId, date])
+}
+
+model Challenge {
+  id           String     @id @default(uuid())
+  title        String
+  description  String
+  type         ChallengeType
+  durationDays Int
+  difficulty   DifficultyLevel
+  startDate    DateTime
+  endDate      DateTime
+  dailyTasks   Json       // Structure for daily objectives
+  participants UserChallenge[]
+  reward       String?
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@index([type, difficulty])
+}
+
+model UserChallenge {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  challenge    Challenge  @relation(fields: [challengeId], references: [id])
+  challengeId  String
+  progress     Int        @default(0)
+  completed    Boolean    @default(false)
+  lastUpdated  DateTime   @default(now())
+
+  @@index([userId, challengeId])
+  @@unique([userId, challengeId])
+}
+
+model ProgressLog {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  type         String     // "weight", "body-fat", "measurements"
+  value        Float
+  notes        String?
+  photos       String[]   // URLs to stored images
+  loggedAt     DateTime   @default(now()) @map("logged_at")
+
+  @@index([userId, type, loggedAt])
+}
+
+model BodyMeasurement {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  chest        Float?
+  waist        Float?
+  hips         Float?
+  arms         Float?
+  thighs       Float?
+  loggedAt     DateTime   @default(now()) @map("logged_at")
+
+  @@index([userId, loggedAt])
+}
+
+model AIHealthAssessment {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  assessmentDate DateTime @default(now())
+  healthData   Json       // Input data used for assessment
+  recommendations Json    // AI-generated recommendations
+  score        Int?
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@index([userId, assessmentDate])
 }
