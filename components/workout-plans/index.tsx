@@ -16,12 +16,15 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { getUserProfileAndGoals } from '@/lib/actions/user.action';
+import { getUserProfileAndGoals, saveWorkoutProgram } from '@/lib/actions/user.action';
+import { SavedWorkoutsList } from './SavedWorkoutsList';
+import { toast } from "sonner";
 
 const WorkoutPlans = () => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [workoutPlan, setWorkoutPlan] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [context, setContext] = useState({
     fitnessLevel: 'beginner',
     goals: ['general fitness'],
@@ -57,6 +60,25 @@ const WorkoutPlans = () => {
     fetchUserData();
   }, []);
 
+  const handleSaveWorkout = async () => {
+    setIsSaving(true);
+    try {
+      const title = `Workout Plan ${new Date().toLocaleDateString()}`;
+      const description = workoutPlan;
+      const difficulty = context.fitnessLevel;
+      
+      const result = await saveWorkoutProgram(title, description, difficulty);
+      if (result.error) {
+        toast.error('Failed to save workout plan');
+        console.error('Failed to save workout plan:', result.error);
+      } else {
+        toast.success('Workout plan saved successfully!');
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleGetWorkout = async () => {
     setIsLoading(true);
     setWorkoutPlan('');
@@ -76,7 +98,7 @@ const WorkoutPlans = () => {
   };
 
   return (
-    <div className="flex justify-center items-start h-full mt-10 p-1 mb-12">
+    <div className="flex flex-col items-center h-full mt-10 p-1 mb-12 space-y-6">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="text-xl">AI Workout Planner</CardTitle>
@@ -141,12 +163,22 @@ const WorkoutPlans = () => {
             {isLoading ? 'Generating...' : 'Get Workout Plan'}
           </Button>
 
+
           {workoutPlan && (
-            <Card className="mt-6">
+            <Card className="mt-6 relative">
               <CardHeader>
                 <CardTitle className="text-lg">Suggested Workout</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
+                <div className="flex justify-end mb-4">
+                  <Button 
+                    onClick={handleSaveWorkout}
+                    variant="outline"
+                    disabled={isSaving}
+                  >
+                    {isSaving ? 'Saving...' : 'Save Plan'}
+                  </Button>
+                </div>
                 <div className="prose prose-sm max-w-none">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -186,6 +218,8 @@ const WorkoutPlans = () => {
           )}
         </CardContent>
       </Card>
+      
+      <SavedWorkoutsList />
     </div>
   );
 };

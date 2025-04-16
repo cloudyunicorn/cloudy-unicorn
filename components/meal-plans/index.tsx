@@ -9,7 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { getUserProfileAndGoals } from '@/lib/actions/user.action';
+import { getUserProfileAndGoals, saveMealPlan } from '@/lib/actions/user.action';
+import { MealPlansList, type MealPlan } from './MealPlansList';
 
 const MealPlans = () => {
   const [query, setQuery] = useState('');
@@ -22,6 +23,24 @@ const MealPlans = () => {
     healthConditions: [],
     bodyMetrics: {},
   });
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSavePlan = async () => {
+    setIsSaving(true);
+    try {
+      const title = `Meal Plan ${new Date().toLocaleDateString()}`;
+      const description = mealSuggestions;
+      const calories = 2000; // Default value, can be calculated from context
+      const tags = context.diet.split(',').map(t => t.trim());
+      
+      const result = await saveMealPlan(title, description, calories, tags);
+      if (result.error) {
+        console.error('Failed to save meal plan:', result.error);
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -56,9 +75,9 @@ const MealPlans = () => {
     try {
       const prompt = getMealPrompt(context, query);
       const responseStream = getFitnessResponse(prompt, context);
-      
+
       for await (const chunk of responseStream) {
-        setMealSuggestions(prev => prev + chunk);
+        setMealSuggestions((prev) => prev + chunk);
       }
     } catch (error) {
       console.error('Error getting meal suggestions:', error);
@@ -69,7 +88,7 @@ const MealPlans = () => {
   };
 
   return (
-    <div className="flex justify-center items-start h-full mt-10 p-1 mb-12">
+    <div className="flex flex-col items-center h-full mt-10 p-1 mb-12 space-y-6">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="text-xl">AI Meal Planner</CardTitle>
@@ -105,11 +124,20 @@ const MealPlans = () => {
           </Button>
 
           {mealSuggestions && (
-            <Card className="mt-6">
+            <Card className="mt-6 relative">
               <CardHeader>
                 <CardTitle className="text-lg">Suggested Meal Plan</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
+                <div className="flex justify-end mb-4">
+                    <Button 
+                      onClick={handleSavePlan}
+                      variant="outline"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? 'Saving...' : 'Save Plan'}
+                    </Button>
+                </div>
                 <div className="prose prose-sm max-w-none">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -149,6 +177,8 @@ const MealPlans = () => {
           )}
         </CardContent>
       </Card>
+
+      <MealPlansList />
     </div>
   );
 };

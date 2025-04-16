@@ -213,3 +213,168 @@ export async function updateUserProfileAndGoals(formData: BodyInfoFormDataServer
     return { error: "An unexpected error occurred while updating your profile." };
   }
 }
+
+// --- Save Meal Plan Action ---
+export async function saveMealPlan(title: string, content: string, calories: number, tags: string[]) {
+  'use server';
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error("Authentication error:", authError);
+      return { error: "User not authenticated." };
+    }
+
+    const userRecord = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { id: true }
+    });
+
+    if (!userRecord) {
+      throw new Error(`User record not found for auth ID: ${user.id}`);
+    }
+
+    await prisma.mealPlan.create({
+      data: {
+        userId: userRecord.id,
+        title: title,
+        description: content,
+        days: { content: content }, // Store markdown content as JSON
+        caloriesPerDay: calories,
+        dietaryTags: tags,
+      }
+    });
+
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving meal plan:", error);
+    return { error: "Failed to save meal plan." };
+  }
+}
+
+// --- Save Workout Program Action ---
+export async function saveWorkoutProgram(title: string, content: string, difficulty: string) {
+  'use server';
+  try {
+    // Validate inputs
+    if (!title || !content) {
+      return { error: "Title and content are required" };
+    }
+
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error("Authentication error:", authError);
+      return { error: "User not authenticated. Please sign in again." };
+    }
+
+    const userRecord = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { id: true }
+    });
+
+    if (!userRecord) {
+      console.error(`User record not found for auth ID: ${user.id}`);
+      return { error: "User profile not found. Please complete your profile first." };
+    }
+
+    // Convert and validate difficulty level
+    const upperDifficulty = difficulty.toUpperCase();
+    const validDifficulties = Object.values(DifficultyLevel);
+    if (!validDifficulties.includes(upperDifficulty as DifficultyLevel)) {
+      return { error: `Invalid difficulty level. Valid options are: ${validDifficulties.join(', ')}` };
+    }
+
+    await prisma.workoutProgram.create({
+      data: {
+        userId: userRecord.id,
+        title: title,
+        description: content,
+        durationWeeks: 1, // Default duration
+        daysPerWeek: 3, // Default frequency
+        difficulty: upperDifficulty as DifficultyLevel,
+      }
+    });
+
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving workout program:", {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    return { error: "Failed to save workout program. Please try again." };
+  }
+}
+
+// --- Fetch Saved Meal Plans Action ---
+export async function getSavedMealPlans() {
+  'use server';
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error("Authentication error:", authError);
+      return { error: "User not authenticated." };
+    }
+
+    const userRecord = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { id: true }
+    });
+
+    if (!userRecord) {
+      throw new Error(`User record not found for auth ID: ${user.id}`);
+    }
+
+    const plans = await prisma.mealPlan.findMany({
+      where: { userId: userRecord.id },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    });
+
+    return { plans };
+  } catch (error) {
+    console.error("Error fetching meal plans:", error);
+    return { error: "Failed to fetch meal plans." };
+  }
+}
+
+// --- Fetch Saved Workout Programs Action ---
+export async function getSavedWorkoutPrograms() {
+  'use server';
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error("Authentication error:", authError);
+      return { error: "User not authenticated." };
+    }
+
+    const userRecord = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { id: true }
+    });
+
+    if (!userRecord) {
+      throw new Error(`User record not found for auth ID: ${user.id}`);
+    }
+
+    const programs = await prisma.workoutProgram.findMany({
+      where: { userId: userRecord.id },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    });
+
+    return { programs };
+  } catch (error) {
+    console.error("Error fetching workout programs:", error);
+    return { error: "Failed to fetch workout programs." };
+  }
+}
