@@ -69,10 +69,10 @@ const WorkoutPlans = () => {
       
       const result = await saveWorkoutProgram(title, description, difficulty);
       if (result.error) {
-        toast.error('Failed to save workout plan');
+        toast('Failed to save workout plan');
         console.error('Failed to save workout plan:', result.error);
       } else {
-        toast.success('Workout plan saved successfully!');
+        toast('Workout plan saved successfully!');
       }
     } finally {
       setIsSaving(false);
@@ -128,17 +128,15 @@ const WorkoutPlans = () => {
             <Input
               id="equipment"
               value={context.currentPlan.workouts.join(', ')}
-              onChange={(e) =>
+              onChange={(e) => {
                 setContext({
                   ...context,
                   currentPlan: {
                     ...context.currentPlan,
-                    workouts: e.target.value
-                      .split(',')
-                      .map((item) => item.trim()),
+                    workouts: [e.target.value],
                   },
-                })
-              }
+                });
+              }}
               className="h-10"
               placeholder="E.g. dumbbells, resistance bands"
             />
