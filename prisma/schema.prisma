@@ -62,6 +62,14 @@ enum Gender {
   PREFER_NOT_TO_SAY
 }
 
+enum ActivityLevel {
+  SEDENTARY
+  LIGHTLY_ACTIVE
+  MODERATELY_ACTIVE
+  VERY_ACTIVE
+  EXTREMELY_ACTIVE
+}
+
 model UserProfile {
   id               String    @id @default(uuid())
   user             User      @relation(fields: [userId], references: [id])
@@ -74,6 +82,7 @@ model UserProfile {
   dietaryPreferences String[]
   fitnessLevel     DifficultyLevel?
   targetWeight     Float?
+  activityLevel   ActivityLevel?
   createdAt        DateTime  @default(now()) @map("created_at")
   
   @@index([userId, age])

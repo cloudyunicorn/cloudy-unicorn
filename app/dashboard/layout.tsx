@@ -38,7 +38,7 @@ export default function DashboardLayout({
       />
       <SidebarInset>
         <DashboardHeader activeItem={activeItem} />
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col mb-16 md:mb-0">
           <div className="@container/main flex flex-1 flex-col gap-2">
             {ActiveComponent ? React.createElement(ActiveComponent) : children}
           </div>

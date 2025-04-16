@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import prisma from "@/lib/prisma";
-import { FitnessGoal, DifficultyLevel, Gender } from '@prisma/client';
+import { FitnessGoal, DifficultyLevel, Gender, ActivityLevel } from '@prisma/client';
 import { revalidatePath } from "next/cache";
 
 const formSchema = z.object({
@@ -83,6 +83,7 @@ export async function getUserProfileAndGoals() {
             dietaryPreferences: true,
             fitnessLevel: true,
             targetWeight: true,
+            activityLevel: true,
           }
         },
         _count: {
@@ -138,6 +139,7 @@ const bodyInfoSchemaServer = z.object({
   dietaryPreferences: z.string().optional().nullable(),
   fitnessLevel: z.nativeEnum(DifficultyLevel).optional().nullable(),
   targetWeight: z.coerce.number().positive().optional().nullable(),
+  activityLevel: z.nativeEnum(ActivityLevel).optional().nullable(),
   goals: z.array(z.nativeEnum(FitnessGoal)).min(1, 'Select at least one goal'),
 });
 
@@ -172,6 +174,7 @@ export async function updateUserProfileAndGoals(formData: BodyInfoFormDataServer
       dietaryPreferences: validatedData.dietaryPreferences?.split(',').map((s: string) => s.trim()).filter(Boolean) ?? [],
       fitnessLevel: validatedData.fitnessLevel ?? null,
       targetWeight: validatedData.targetWeight ?? null,
+      activityLevel: validatedData.activityLevel ?? null,
     };
 
     await prisma.$transaction(async (tx) => {

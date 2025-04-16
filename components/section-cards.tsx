@@ -31,13 +31,9 @@ type UserData = {
   stats: UserStatsData;
 } | null;
 
-// Calculate maintenance calories using Mifflin-St Jeor formula
-const calculateMaintenanceCalories = (weight: number, height: number, age: number, isMale: boolean) => {
-  // Mifflin-St Jeor Equation
-  const bmr = (10 * weight) + (6.25 * height) - (5 * age) + (isMale ? 5 : -161);
-  
-  // Apply activity factor (using moderate activity as default)
-  return Math.round(bmr * 1.55);
+// Calculate BMR using Mifflin-St Jeor formula
+const calculateBMR = (weight: number, height: number, age: number, isMale: boolean) => {
+  return (10 * weight) + (6.25 * height) - (5 * age) + (isMale ? 5 : -161);
 };
 
 export function SectionCards() {
@@ -68,9 +64,9 @@ export function SectionCards() {
   const stats = userData?.stats;
   const primaryGoal = goals && goals.length > 0 ? goals[0] : null;
 
-  // Calculate maintenance calories if we have the required data
-  const maintenanceCalories = profile?.weight && profile?.height && profile?.age 
-    ? calculateMaintenanceCalories(profile.weight, profile.height, profile.age, true) // Assuming male for now
+  // Calculate BMR if we have the required data
+  const bmr = profile?.weight && profile?.height && profile?.age 
+    ? calculateBMR(profile.weight, profile.height, profile.age, true) // Assuming male for now
     : null;
 
 
@@ -117,12 +113,12 @@ export function SectionCards() {
         </CardFooter>
       </Card>
 
-      {/* Maintenance Calories Card */}
+      {/* BMR Card */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Flame className="h-4 w-4" />
-            Maintenance Calories
+            Basal Metabolic Rate
           </div>
           {isLoading ? (
             <div className="flex items-center justify-center h-8">
@@ -130,16 +126,16 @@ export function SectionCards() {
             </div>
           ) : (
             <CardTitle>
-              {maintenanceCalories ? `${maintenanceCalories} kcal` : '-'}
+              {bmr ? `${Math.round(bmr)} kcal/day` : '-'}
             </CardTitle>
           )}
         </CardHeader>
         <CardFooter>
           <div className="text-sm">
-            {maintenanceCalories ? (
+            {bmr ? (
               <>
-                <div>Estimated daily needs</div>
-                <div className="text-muted-foreground">Based on your body metrics</div>
+                <div>Calories at complete rest</div>
+                <div className="text-muted-foreground">Your body's base energy needs</div>
               </>
             ) : (
               <div>Complete your body info to calculate</div>

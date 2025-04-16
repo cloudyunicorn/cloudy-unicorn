@@ -1,9 +1,11 @@
-import React from 'react'
+import React from 'react';
 
 const ProgressTrack = () => {
   return (
-    <div>ProgressTrack</div>
-  )
-}
+    <div className="flex justify-center items-center p-20">
+      <p>Component building in progress, come back soon...</p>
+    </div>
+  );
+};
 
-export default ProgressTrack
+export default ProgressTrack;
