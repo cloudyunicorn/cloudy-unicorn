@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { getUserProfileAndGoals, saveMealPlan } from '@/lib/actions/user.action';
 import { MealPlansList, type MealPlan } from './MealPlansList';
+import { toast } from 'sonner';
 
 const MealPlans = () => {
   const [query, setQuery] = useState('');
@@ -31,11 +32,16 @@ const MealPlans = () => {
       const title = `Meal Plan ${new Date().toLocaleDateString()}`;
       const description = mealSuggestions;
       const calories = 2000; // Default value, can be calculated from context
-      const tags = context.diet.split(',').map(t => t.trim());
+      const tags = context.diet.split(',')
+        .map(t => t.trim())
+        .filter(t => t !== '');
       
       const result = await saveMealPlan(title, description, calories, tags);
       if (result.error) {
+        toast.error('Failed to save meal plan');
         console.error('Failed to save meal plan:', result.error);
+      } else {
+        toast.success('Meal plan saved successfully!');
       }
     } finally {
       setIsSaving(false);
@@ -99,7 +105,12 @@ const MealPlans = () => {
             <Input
               id="diet"
               value={context.diet}
-              onChange={(e) => setContext({ ...context, diet: e.target.value })}
+              onChange={(e) => {
+                setContext({ 
+                  ...context, 
+                  diet: e.target.value 
+                });
+              }}
               className="h-10"
             />
           </div>

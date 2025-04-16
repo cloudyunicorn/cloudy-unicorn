@@ -69,10 +69,10 @@ const WorkoutPlans = () => {
       
       const result = await saveWorkoutProgram(title, description, difficulty);
       if (result.error) {
-        toast('Failed to save workout plan');
+        toast.error('Failed to save workout plan');
         console.error('Failed to save workout plan:', result.error);
       } else {
-        toast('Workout plan saved successfully!');
+        toast.success('Workout plan saved successfully!');
       }
     } finally {
       setIsSaving(false);
