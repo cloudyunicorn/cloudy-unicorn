@@ -33,6 +33,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState, useEffect } from 'react';
 import { UserCog } from 'lucide-react';
+import { useData } from '@/contexts/DataContext';
 import {
   FitnessGoal,
   DifficultyLevel,
@@ -148,6 +149,8 @@ export function BodyInfoDialog() {
     }
   }, [isOpen, form]);
 
+  const { refetch } = useData();
+
   async function onSubmit(values: BodyInfoFormData) {
     setIsSubmitting(true);
     try {
@@ -163,6 +166,7 @@ export function BodyInfoDialog() {
       } else {
         toast.success('Profile updated successfully!');
         setIsOpen(false);
+        refetch();
       }
     } catch (error) {
       console.error('Unexpected error during profile update:', error);
