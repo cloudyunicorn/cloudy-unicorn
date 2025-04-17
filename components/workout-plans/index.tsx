@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -16,7 +16,8 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { getUserProfileAndGoals, saveWorkoutProgram } from '@/lib/actions/user.action';
+import { saveWorkoutProgram } from '@/lib/actions/user.action';
+import { useData } from '@/contexts/DataContext';
 import { SavedWorkoutsList } from './SavedWorkoutsList';
 import { toast } from "sonner";
 
@@ -25,7 +26,25 @@ const WorkoutPlans = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [workoutPlan, setWorkoutPlan] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [context, setContext] = useState({
+  interface BodyMetrics {
+    age?: number;
+    weight?: number;
+    height?: number;
+    bodyFatPercentage?: number;
+    gender?: string;
+  }
+
+  interface WorkoutContext {
+    fitnessLevel: string;
+    goals: string[];
+    healthConditions: string[];
+    currentPlan: {
+      workouts: string[];
+    };
+    bodyMetrics: BodyMetrics;
+  }
+
+  const [context, setContext] = useState<WorkoutContext>({
     fitnessLevel: 'beginner',
     goals: ['general fitness'],
     healthConditions: [],
@@ -35,30 +54,23 @@ const WorkoutPlans = () => {
     bodyMetrics: {},
   });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await getUserProfileAndGoals();
-        if (userData?.profile) {
-          const profile = userData.profile;
-          setContext((prev) => ({
-            ...prev,
-            fitnessLevel: profile.fitnessLevel?.toLowerCase() || 'beginner',
-            bodyMetrics: {
-              age: profile.age ?? undefined,
-              weight: profile.weight ?? undefined,
-              height: profile.height ?? undefined,
-              bodyFatPercentage: profile.bodyFatPercentage ?? undefined,
-              gender: profile.gender ?? undefined,
-            },
-          }));
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-    fetchUserData();
-  }, []);
+  const { data: userData, refetch } = useData();
+  
+  // Set context from user data
+  if (userData?.profile && !context.bodyMetrics.age) {
+    const profile = userData.profile;
+    setContext({
+      ...context,
+      fitnessLevel: profile.fitnessLevel?.toLowerCase() || 'beginner',
+      bodyMetrics: {
+        age: profile.age ?? undefined,
+        weight: profile.weight ?? undefined,
+        height: profile.height ?? undefined,
+        bodyFatPercentage: profile.bodyFatPercentage ?? undefined,
+        gender: profile.gender ?? undefined,
+      },
+    });
+  }
 
   const handleSaveWorkout = async () => {
     setIsSaving(true);
@@ -72,6 +84,7 @@ const WorkoutPlans = () => {
         toast.error('Failed to save workout plan');
         console.error('Failed to save workout plan:', result.error);
       } else {
+        await refetch();
         toast.success('Workout plan saved successfully!');
       }
     } finally {
@@ -161,7 +174,6 @@ const WorkoutPlans = () => {
             {isLoading ? 'Generating...' : 'Get Workout Plan'}
           </Button>
 
-
           {workoutPlan && (
             <Card className="mt-6 relative">
               <CardHeader>
@@ -217,7 +229,7 @@ const WorkoutPlans = () => {
         </CardContent>
       </Card>
       
-      <SavedWorkoutsList />
+      <SavedWorkoutsList onSave={refetch} />
     </div>
   );
 };

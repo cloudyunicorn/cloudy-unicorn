@@ -5,6 +5,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import React, { useState } from 'react';
 import { DashboardHeader } from "./dashboard-header";
 import MobileNavbar from '@/components/sidebar/MobileNavbar';
+import { DataProvider } from '@/contexts/DataContext'; // Added DataProvider import
 
 const defaultItem = data.navMain.find((item) => item.title === 'Dashboard');
 
@@ -29,25 +30,27 @@ export default function DashboardLayout({
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar
-        items={data.navMain}
-        activeItem={activeItem}
-        onSelectComponent={handleSelectComponent}
-        variant="inset"
-      />
-      <SidebarInset>
-        <DashboardHeader activeItem={activeItem} />
-        <div className="flex flex-1 flex-col mb-16 md:mb-0">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            {ActiveComponent ? React.createElement(ActiveComponent) : children}
+    <DataProvider>
+      <SidebarProvider>
+        <AppSidebar
+          items={data.navMain}
+          activeItem={activeItem}
+          onSelectComponent={handleSelectComponent}
+          variant="inset"
+        />
+        <SidebarInset>
+          <DashboardHeader activeItem={activeItem} />
+          <div className="flex flex-1 flex-col mb-16 md:mb-0">
+            <div className="@container/main flex flex-1 flex-col gap-2">
+              {ActiveComponent ? React.createElement(ActiveComponent) : children}
+            </div>
           </div>
-        </div>
-      </SidebarInset>
-      <MobileNavbar 
-        activeItem={activeItem}
-        onSelectComponent={handleSelectComponent}
-      />
-    </SidebarProvider>
+        </SidebarInset>
+        <MobileNavbar
+          activeItem={activeItem}
+          onSelectComponent={handleSelectComponent}
+        />
+      </SidebarProvider>
+    </DataProvider>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { UserCog, Info, Dumbbell, Target, Weight, Flame } from 'lucide-react';
-import { getUserProfileAndGoals } from '@/lib/actions/user.action';
+import React from 'react';
+import { UserCog, Dumbbell, Weight, Flame } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
+import { useData } from '@/contexts/DataContext';
 import { formatDistanceToNow } from 'date-fns';
 import { FitnessGoal, DifficultyLevel } from '@prisma/client';
 import { BodyInfoDialog } from "./body-info-dialog";
@@ -37,27 +37,7 @@ const calculateBMR = (weight: number, height: number, age: number, isMale: boole
 };
 
 export function SectionCards() {
-  const [userData, setUserData] = useState<UserData>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await getUserProfileAndGoals();
-        setUserData(data);
-      } catch (err) {
-        console.error("Failed to fetch user data:", err);
-        setError("Could not load user data.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const { data: userData, isLoading, error } = useData();
 
   const profile = userData?.profile;
   const goals = userData?.goals;
@@ -73,7 +53,7 @@ export function SectionCards() {
   if (error) {
     return (
       <div className="px-4 lg:px-6 text-destructive">
-        Error loading dashboard cards: {error}
+        Error loading dashboard cards: {error.message || String(error)}
       </div>
     );
   }

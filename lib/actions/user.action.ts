@@ -104,6 +104,14 @@ export async function getUserProfileAndGoals() {
           orderBy: { loggedAt: 'desc' },
           take: 1,
           select: { value: true, loggedAt: true }
+        },
+        workoutPrograms: {
+          orderBy: { createdAt: 'desc' },
+          take: 5
+        },
+        mealPlans: {
+          orderBy: { createdAt: 'desc' },
+          take: 5
         }
       }
     });
@@ -120,7 +128,9 @@ export async function getUserProfileAndGoals() {
         workoutsThisWeek: userData._count.workoutSessions,
         activeChallenges: userData._count.challenges,
         latestWeightLog: userData.progressLogs.length > 0 ? userData.progressLogs[0] : null,
-      }
+      },
+      workoutPrograms: userData.workoutPrograms,
+      mealPlans: userData.mealPlans
     };
 
   } catch (error) {
@@ -238,7 +248,7 @@ export async function saveMealPlan(title: string, content: string, calories: num
       throw new Error(`User record not found for auth ID: ${user.id}`);
     }
 
-    await prisma.mealPlan.create({
+    const newMealPlan = await prisma.mealPlan.create({
       data: {
         userId: userRecord.id,
         title: title,
@@ -250,7 +260,7 @@ export async function saveMealPlan(title: string, content: string, calories: num
     });
 
     revalidatePath('/dashboard');
-    return { success: true };
+    return { success: true, mealPlan: newMealPlan };
   } catch (error) {
     console.error("Error saving meal plan:", error);
     return { error: "Failed to save meal plan." };
@@ -291,7 +301,7 @@ export async function saveWorkoutProgram(title: string, content: string, difficu
       return { error: `Invalid difficulty level. Valid options are: ${validDifficulties.join(', ')}` };
     }
 
-    await prisma.workoutProgram.create({
+    const newWorkoutProgram = await prisma.workoutProgram.create({
       data: {
         userId: userRecord.id,
         title: title,
@@ -303,7 +313,7 @@ export async function saveWorkoutProgram(title: string, content: string, difficu
     });
 
     revalidatePath('/dashboard');
-    return { success: true };
+    return { success: true, workoutProgram: newWorkoutProgram };
   } catch (error) {
     console.error("Error saving workout program:", {
       error,

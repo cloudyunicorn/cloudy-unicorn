@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { getSavedMealPlans, saveMealPlan } from '@/lib/actions/user.action';
+import { useData } from '@/contexts/DataContext';
 
 export type MealPlan = {
   id: string;
@@ -21,63 +20,12 @@ export type MealPlan = {
 };
 
 type MealPlansListProps = {
-  initialPlans?: MealPlan[];
-  onSave?: (plan: MealPlan) => void;
+  onSave?: (plan: MealPlan) => Promise<void> | void;
 };
 
-export const MealPlansList = ({ initialPlans = [], onSave }: MealPlansListProps) => {
-  const [plans, setPlans] = useState<MealPlan[]>(initialPlans);
+export const MealPlansList = ({ onSave }: MealPlansListProps) => {
+  const { data, isLoading, error, refetch } = useData();
   const [selectedPlan, setSelectedPlan] = useState<MealPlan | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const fetchSavedPlans = async () => {
-    setIsLoading(true);
-    try {
-      const result = await getSavedMealPlans();
-      if (result?.plans) {
-        setPlans(result.plans);
-      }
-    } catch (err) {
-      setError('Failed to load saved meal plans');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSavePlan = async (title: string, description: string, calories: number, tags: string[]) => {
-    setIsLoading(true);
-    try {
-      const result = await saveMealPlan(title, description, calories, tags);
-      if (result.error) {
-        setError(result.error);
-      } else {
-        await fetchSavedPlans();
-        onSave?.({
-          title,
-          description,
-          caloriesPerDay: calories,
-          dietaryTags: tags,
-          id: '', // Will be set after fetch
-          userId: '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          days: { content: description },
-          isActive: false
-        });
-      }
-    } catch (err) {
-      setError('Failed to save meal plan');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (initialPlans.length === 0) {
-      fetchSavedPlans();
-    }
-  }, []);
 
   return (
     <>
@@ -86,13 +34,13 @@ export const MealPlansList = ({ initialPlans = [], onSave }: MealPlansListProps)
           <CardTitle className="text-lg">Your Saved Meal Plans</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading && plans.length === 0 ? (
+      {isLoading && (!data?.mealPlans || data.mealPlans.length === 0) ? (
             <p className="text-sm text-gray-500">Loading...</p>
           ) : error ? (
-            <p className="text-sm text-red-500">{error}</p>
-          ) : plans.length > 0 ? (
-            <div className="space-y-3">
-              {plans.map((plan) => (
+            <p className="text-sm text-red-500">{error.message || 'Failed to load meal plans'}</p>
+        ) : data?.mealPlans && data.mealPlans.length > 0 ? (
+          <div className="space-y-3">
+            {data.mealPlans.map((plan) => (
                 <div key={plan.id} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start">
                     <div>
@@ -111,8 +59,8 @@ export const MealPlansList = ({ initialPlans = [], onSave }: MealPlansListProps)
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="text-sm text-gray-500">No saved meal plans yet</p>
+        ) : (
+          <p className="text-sm text-gray-500">No saved meal plans found</p>
           )}
         </CardContent>
       </Card>

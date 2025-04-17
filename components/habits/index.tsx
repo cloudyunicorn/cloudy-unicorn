@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -9,44 +9,50 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { getUserProfileAndGoals } from '@/lib/actions/user.action';
+import { useData } from '@/contexts/DataContext';
 
 const Habits = () => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [habitSuggestions, setHabitSuggestions] = useState('');
-  const [context, setContext] = useState({
+  interface BodyMetrics {
+    age?: number;
+    weight?: number;
+    targetWeight?: number;
+  }
+
+  interface HabitContext {
+    fitnessLevel: string;
+    goals: string[];
+    healthConditions: string[];
+    bodyMetrics: BodyMetrics;
+  }
+
+  const [context, setContext] = useState<HabitContext>({
     fitnessLevel: 'moderate',
     goals: ['improve sleep', 'reduce stress'],
     healthConditions: [],
     bodyMetrics: {},
   });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await getUserProfileAndGoals();
-        if (userData?.profile) {
-          const profile = userData.profile;
-          setContext((prev) => ({
-            ...prev,
-            fitnessLevel: profile.fitnessLevel?.toLowerCase() || 'moderate',
-            goals: userData.goals?.map((g) =>
-              g.toLowerCase().replace(/_/g, ' ')
-            ) || ['improve sleep', 'reduce stress'],
-            bodyMetrics: {
-              age: profile.age ?? undefined,
-              weight: profile.weight ?? undefined,
-              targetWeight: profile.targetWeight ?? undefined,
-            },
-          }));
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-    fetchUserData();
-  }, []);
+  const { data: userData } = useData();
+  
+  // Set context from user data
+  if (userData?.profile && !context.bodyMetrics.age) {
+    const profile = userData.profile;
+    setContext({
+      ...context,
+      fitnessLevel: profile.fitnessLevel?.toLowerCase() || 'moderate',
+      goals: userData.goals?.map((g) =>
+        g.toLowerCase().replace(/_/g, ' ')
+      ) || ['improve sleep', 'reduce stress'],
+      bodyMetrics: {
+        age: profile.age ?? undefined,
+        weight: profile.weight ?? undefined,
+        targetWeight: profile.targetWeight ?? undefined,
+      },
+    });
+  }
 
   const handleGetHabits = async () => {
     setIsLoading(true);

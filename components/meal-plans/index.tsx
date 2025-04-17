@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -9,7 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { getUserProfileAndGoals, saveMealPlan } from '@/lib/actions/user.action';
+import { saveMealPlan } from '@/lib/actions/user.action';
+import { useData } from '@/contexts/DataContext';
 import { MealPlansList, type MealPlan } from './MealPlansList';
 import { toast } from 'sonner';
 
@@ -17,7 +18,24 @@ const MealPlans = () => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [mealSuggestions, setMealSuggestions] = useState('');
-  const [context, setContext] = useState({
+  interface BodyMetrics {
+    age?: number;
+    weight?: number;
+    height?: number;
+    bodyFatPercentage?: number;
+    gender?: string;
+    targetWeight?: number;
+  }
+
+  interface ContextType {
+    diet: string;
+    goals: string[];
+    fitnessLevel: string;
+    healthConditions: string[];
+    bodyMetrics: BodyMetrics;
+  }
+
+  const [context, setContext] = useState<ContextType>({
     diet: 'balanced',
     goals: ['weight maintenance'],
     fitnessLevel: 'beginner',
@@ -25,13 +43,14 @@ const MealPlans = () => {
     bodyMetrics: {},
   });
   const [isSaving, setIsSaving] = useState(false);
+  const { data: userData, refetch } = useData();
 
   const handleSavePlan = async () => {
     setIsSaving(true);
     try {
       const title = `Meal Plan ${new Date().toLocaleDateString()}`;
       const description = mealSuggestions;
-      const calories = 2000; // Default value, can be calculated from context
+      const calories = 2000;
       const tags = context.diet.split(',')
         .map(t => t.trim())
         .filter(t => t !== '');
@@ -41,6 +60,7 @@ const MealPlans = () => {
         toast.error('Failed to save meal plan');
         console.error('Failed to save meal plan:', result.error);
       } else {
+        await refetch();
         toast.success('Meal plan saved successfully!');
       }
     } finally {
@@ -48,32 +68,24 @@ const MealPlans = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await getUserProfileAndGoals();
-        if (userData?.profile) {
-          const profile = userData.profile;
-          setContext((prev) => ({
-            ...prev,
-            diet: profile.dietaryPreferences?.join(', ') || 'balanced',
-            fitnessLevel: profile.fitnessLevel?.toLowerCase() || 'beginner',
-            bodyMetrics: {
-              age: profile.age ?? undefined,
-              weight: profile.weight ?? undefined,
-              height: profile.height ?? undefined,
-              bodyFatPercentage: profile.bodyFatPercentage ?? undefined,
-              gender: profile.gender ?? undefined,
-              targetWeight: profile.targetWeight ?? undefined,
-            },
-          }));
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-    fetchUserData();
-  }, []);
+  // Set context from user data
+  if (userData?.profile && !context.bodyMetrics.age) {
+    const profile = userData.profile;
+    setContext({
+      diet: profile.dietaryPreferences?.join(', ') || 'balanced',
+      goals: userData.goals?.map(g => g.toString()) || ['weight maintenance'],
+      fitnessLevel: profile.fitnessLevel?.toLowerCase() || 'beginner',
+      healthConditions: [],
+      bodyMetrics: {
+        age: profile.age ?? undefined,
+        weight: profile.weight ?? undefined,
+        height: profile.height ?? undefined,
+        bodyFatPercentage: profile.bodyFatPercentage ?? undefined,
+        gender: profile.gender ?? undefined,
+        targetWeight: profile.targetWeight ?? undefined,
+      },
+    });
+  }
 
   const handleGetSuggestions = async () => {
     setIsLoading(true);
@@ -189,7 +201,7 @@ const MealPlans = () => {
         </CardContent>
       </Card>
 
-      <MealPlansList />
+      <MealPlansList onSave={refetch} />
     </div>
   );
 };

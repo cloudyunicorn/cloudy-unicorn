@@ -1,65 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   calculateBMI,
   calculateBMR,
   getBMICategory,
   getHealthyWeightRange,
   getSuggestedCalories,
-  type BodyParams,
 } from '@/utils/body-calculations';
-import { getUserProfileAndGoals } from '@/lib/actions/user.action';
-
 import { Gender, ActivityLevel } from '@prisma/client';
 import { BodyInfoDialog } from '../body-info-dialog';
-
-interface UserProfileData {
-  weight: number | null;
-  height: number | null;
-  age: number | null;
-  gender: Gender | null;
-  activityLevel: ActivityLevel | null;
-}
+import { useData } from '@/contexts/DataContext';
 
 const HealthAssessments = () => {
-  const [profileData, setProfileData] = useState<UserProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getUserProfileAndGoals();
-        if (!data?.profile) {
-          throw new Error('Profile data not found');
-        }
-        setProfileData({
-          weight: data.profile.weight,
-          height: data.profile.height,
-          age: data.profile.age,
-          gender: data.profile.gender,
-          activityLevel: data.profile.activityLevel,
-        });
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to fetch profile data'
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) return <div>Loading body metrics...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
+  const { data: userData, isLoading, error } = useData();
+  
+  if (isLoading) return <div>Loading body metrics...</div>;
+  if (error) return <div className="text-red-500">{error.message}</div>;
   if (
-    !profileData ||
-    !profileData.weight ||
-    !profileData.height ||
-    !profileData.age ||
-    !profileData.gender ||
-    !profileData.activityLevel
+    !userData?.profile ||
+    !userData.profile.weight ||
+    !userData.profile.height ||
+    !userData.profile.age ||
+    !userData.profile.gender ||
+    !userData.profile.activityLevel
   ) {
     return (
       <div className="flex flex-col justify-center items-center p-4">
@@ -73,18 +35,19 @@ const HealthAssessments = () => {
     );
   }
 
-  const { weight, height, age, gender, activityLevel } = profileData;
-  const bmi = calculateBMI(weight, height);
+  const { weight, height, age, gender, activityLevel } = userData.profile;
+  
+  const bmi = calculateBMI(weight!, height!);
   // Convert Prisma enums to calculation-friendly formats
   const genderForCalc = gender?.toLowerCase() === 'male' ? 'male' : 'female';
   const bmr = calculateBMR({
-    weight,
-    height,
-    age,
+    weight: weight!,
+    height: height!,
+    age: age!,
     gender: genderForCalc,
-    activityLevel,
+    activityLevel: activityLevel!,
   });
-  const [minWeight, maxWeight] = getHealthyWeightRange(height);
+  const [minWeight, maxWeight] = getHealthyWeightRange(height!);
   const suggestedCalories = getSuggestedCalories(bmr, activityLevel!);
 
   return (
