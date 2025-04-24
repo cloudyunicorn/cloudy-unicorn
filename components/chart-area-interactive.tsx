@@ -2,7 +2,13 @@
 
 import * as React from "react"
 import { RadialBar, RadialBarChart, ResponsiveContainer } from "recharts"
-
+import { useData } from "@/contexts/DataContext"
+import { 
+  calculateBMI, 
+  getHealthyWeightRange,
+  getSuggestedCalories,
+  calculateBMR
+} from "@/utils/body-calculations"
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
   Card,
@@ -13,49 +19,90 @@ import {
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
-// Sample fitness data - in a real app this would come from user data
-const fitnessData = [
-  {
-    name: "BMI",
-    value: 24.3,
-    goal: 22,
-    fill: "hsl(var(--chart-1))"
-  },
-  {
-    name: "Calories",
-    value: 1800,
-    goal: 2200,
-    fill: "hsl(var(--chart-2))"
-  },
-  {
-    name: "Protein",
-    value: 120,
-    goal: 150,
-    fill: "hsl(var(--chart-3))"
-  },
-  {
-    name: "Workouts",
-    value: 3,
-    goal: 5,
-    fill: "hsl(var(--chart-4))"
-  },
-  {
-    name: "Weight Goal",
-    value: 72,
-    goal: 68,
-    fill: "hsl(var(--chart-5))"
-  },
-  {
-    name: "Water",
-    value: 1.8,
-    goal: 2.5,
-    fill: "hsl(var(--chart-6))"
-  }
-]
+const getFitnessData = (userData: any) => {
+  if (!userData?.profile) return [];
+
+  const { age, weight, height, gender, activityLevel } = userData.profile;
+  if (!weight || !height || !age || !gender) return [];
+
+  const bmi = calculateBMI(weight, height);
+  const [minWeight, maxWeight] = getHealthyWeightRange(height);
+  const bmr = calculateBMR({
+    weight,
+    height,
+    age,
+    gender: gender.toLowerCase() as 'male' | 'female',
+    activityLevel
+  });
+  const suggestedCalories = getSuggestedCalories(bmr, activityLevel);
+
+  return [
+    {
+      name: "BMI",
+      value: parseFloat(bmi.toFixed(1)),
+      goal: 22, // Ideal BMI
+      fill: "hsl(var(--chart-1))"
+    },
+    {
+      name: "Weight",
+      value: weight,
+      goal: (minWeight + maxWeight) / 2, // Midpoint of healthy range
+      fill: "hsl(var(--chart-2))"
+    },
+    {
+      name: "Calories",
+      value: userData.stats?.dailyCalories || 0,
+      goal: suggestedCalories,
+      fill: "hsl(var(--chart-3))"
+    },
+    {
+      name: "Workouts",
+      value: userData.stats?.workoutsThisWeek || 0,
+      goal: activityLevel === 'SEDENTARY' ? 3 : 5,
+      fill: "hsl(var(--chart-4))"
+    },
+    {
+      name: "Body Fat",
+      value: userData.profile.bodyFatPercentage || 0,
+      goal: gender === 'MALE' ? 15 : 25, // Ideal body fat %
+      fill: "hsl(var(--chart-5))"
+    },
+    {
+      name: "Water",
+      value: userData.stats?.waterIntake || 0,
+      goal: 2.5, // Liters
+      fill: "hsl(var(--chart-6))"
+    }
+  ].filter(item => item.value !== undefined);
+};
 
 
-export function ChartAreaInteractive() {
-  const isMobile = useIsMobile()
+interface ChartAreaInteractiveProps {
+  data?: Array<{
+    type: string;
+    value: number;
+    date: string;
+  }>;
+  metric?: string;
+  unit?: string;
+}
+
+export function ChartAreaInteractive({ 
+  data: externalData, 
+  metric, 
+  unit 
+}: ChartAreaInteractiveProps = {}) {
+  const { data: contextData, isLoading } = useData();
+  const isMobile = useIsMobile();
+  
+  const fitnessData = externalData 
+    ? externalData.map(item => ({
+        name: metric || item.type,
+        value: item.value,
+        goal: 0, // Will be calculated if using context data
+        fill: "hsl(var(--chart-1))"
+      }))
+    : getFitnessData(contextData);
 
   return (
     <Card className="@container/card">

@@ -28,8 +28,8 @@ export const MealPlansList = ({ onSave }: MealPlansListProps) => {
   const [selectedPlan, setSelectedPlan] = useState<MealPlan | null>(null);
 
   return (
-    <>
-      <Card className="mt-6">
+    <div className="mx-6 w-full">
+      <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-lg">Your Saved Meal Plans</CardTitle>
         </CardHeader>
@@ -95,6 +95,6 @@ export const MealPlansList = ({ onSave }: MealPlansListProps) => {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };

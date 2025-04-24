@@ -27,8 +27,8 @@ export const SavedWorkoutsList = ({ onSave }: SavedWorkoutsListProps) => {
   const [selectedProgram, setSelectedProgram] = useState<WorkoutProgram | null>(null);
 
   return (
-    <>
-      <Card className="mt-6">
+    <div className="mx-6 w-full">
+      <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-lg">Your Saved Workouts</CardTitle>
         </CardHeader>
@@ -94,6 +94,6 @@ export const SavedWorkoutsList = ({ onSave }: SavedWorkoutsListProps) => {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };

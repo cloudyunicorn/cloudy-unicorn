@@ -106,8 +106,8 @@ const MealPlans = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-full mt-10 p-1 mb-12 space-y-6">
-      <Card className="max-w-2xl mx-auto">
+    <div className="flex flex-col items-center h-full mt-6 p-1 mb-12 space-y-6 mx-6">
+      <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-xl">AI Meal Planner</CardTitle>
         </CardHeader>

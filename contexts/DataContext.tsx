@@ -22,6 +22,11 @@ type UserStatsData = {
   workoutsThisWeek: number;
   activeChallenges: number;
   latestWeightLog: { value: number; loggedAt: Date } | null;
+  metrics: Array<{
+    type: string;
+    value: number;
+    date: string;
+  }>;
 };
 
 type UserData = {

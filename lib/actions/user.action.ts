@@ -100,10 +100,12 @@ export async function getUserProfileAndGoals() {
           }
         },
         progressLogs: {
-          where: { type: 'weight' },
           orderBy: { loggedAt: 'desc' },
-          take: 1,
-          select: { value: true, loggedAt: true }
+          select: { 
+            type: true,
+            value: true, 
+            loggedAt: true 
+          }
         },
         workoutPrograms: {
           orderBy: { createdAt: 'desc' },
@@ -127,7 +129,12 @@ export async function getUserProfileAndGoals() {
       stats: {
         workoutsThisWeek: userData._count.workoutSessions,
         activeChallenges: userData._count.challenges,
-        latestWeightLog: userData.progressLogs.length > 0 ? userData.progressLogs[0] : null,
+        latestWeightLog: userData.progressLogs.find(log => log.type === 'weight') || null,
+        metrics: userData.progressLogs.map(log => ({
+          type: log.type,
+          value: log.value,
+          date: log.loggedAt.toISOString()
+        }))
       },
       workoutPrograms: userData.workoutPrograms,
       mealPlans: userData.mealPlans
