@@ -13,6 +13,7 @@ import {
 import { ChartContainer, ChartTooltipContent } from "../ui/chart"
 import { useData } from "../../contexts/DataContext"
 import { calculateBMI } from "../../utils/body-calculations"
+import { ProgressStats } from "./ProgressStats"
 
 interface ChartDataPoint {
   date: string
@@ -23,19 +24,34 @@ interface ProgressLineChartProps {
   data: Array<ChartDataPoint>
   metric: string
   unit: string
+  dateRange?: {
+    start: string
+    end: string
+  }
 }
 
-export const ProgressLineChart = ({ data, metric, unit }: ProgressLineChartProps) => {
+export const ProgressLineChart = ({ data, metric, unit, dateRange }: ProgressLineChartProps) => {
+  // Filter data based on date range if provided
+  const filteredData = dateRange 
+    ? data.filter(item => 
+        new Date(item.date) >= new Date(dateRange.start) && 
+        new Date(item.date) <= new Date(dateRange.end)
+      )
+    : data;
+
   // Filter out null values for the chart while keeping them in the original data
   const { data: userData } = useData();
+
   const height = userData?.profile?.height;
+  const weightLogs = userData?.progressLogs?.filter(log => 
+    log.type === 'WEIGHT' && log.value
+  ) || [];
   const fatLogs = userData?.progressLogs?.filter(log => 
     log.type === 'BODY_FAT' && log.value
   ) || [];
 
-
   // Process data with comprehensive null checks and BMI calculation
-  const chartData = data.map(item => {
+  const chartData = filteredData.map(item => {
     // For BMI and body fat metrics, use weight logs if available
     if (metric === 'bmi' || metric === 'bodyFat') {
       if (!height || height <= 0) {
@@ -44,19 +60,22 @@ export const ProgressLineChart = ({ data, metric, unit }: ProgressLineChartProps
       }
 
       // Find weight log for this date
-      const fatLog = fatLogs.find(log => 
+      const weightLog = weightLogs.find(log => 
         new Date(log.loggedAt).toISOString().split('T')[0] === item.date
       );
 
-      if (fatLog) {
-        if (metric === 'bmi') {
-          const bmi = calculateBMI(fatLog.value, height);
+      if (weightLog && metric === 'bmi') {
+          const bmi = calculateBMI(weightLog.value, height);
           return {
             ...item,
             value: bmi,
             date: new Date(item.date).toLocaleDateString()
           };
-        } else if (metric === 'bodyFat') {
+      } else if (metric === 'bodyFat') {
+        const fatLog = fatLogs.find(log => 
+          new Date(log.loggedAt).toISOString().split('T')[0] === item.date
+        );
+        if (fatLog) {
           return {
             ...item,
             value: fatLog.value, // Assuming body fat is logged directly
@@ -89,18 +108,22 @@ export const ProgressLineChart = ({ data, metric, unit }: ProgressLineChartProps
     };
   }).filter(Boolean); // Remove null entries after processing
 
-  console.log('Processed chart data:', chartData);
+  // Get first and last values from the processed chart data
+  const validDataPoints = chartData.filter((item: any) => item.value !== null && item.value !== undefined);
+  const firstValue = validDataPoints[0]?.value;
+  const lastValue = validDataPoints[validDataPoints.length - 1]?.value;
 
   return (
-    <ChartContainer
-      config={{
-        [metric]: {
-          label: metric,
-          color: "#3b82f6" // blue-500
-        }
-      }}
-      className="h-64 w-full"
-    >
+    <div className="space-y-4">
+      <ChartContainer
+        config={{
+          [metric]: {
+            label: metric,
+            color: "#3b82f6" // blue-500
+          }
+        }}
+        className="h-64 w-full"
+      >
       <RechartsLineChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
         <XAxis 
@@ -132,6 +155,13 @@ export const ProgressLineChart = ({ data, metric, unit }: ProgressLineChartProps
           connectNulls={true}
         />
       </RechartsLineChart>
-    </ChartContainer>
+      </ChartContainer>
+      <ProgressStats 
+        firstValue={firstValue}
+        lastValue={lastValue}
+        unit={unit}
+        metric={metric}
+      />
+    </div>
   )
 }

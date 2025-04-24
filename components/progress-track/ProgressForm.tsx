@@ -6,6 +6,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { toast } from 'sonner';
+import { updateUserProfileAndGoals, getUserProfileAndGoals } from '@/lib/actions/user.action';
 
 interface ProgressFormProps {
   onSuccess?: () => void;
@@ -38,6 +39,26 @@ const ProgressForm = ({ onSuccess }: ProgressFormProps) => {
         notes: notes || undefined,
         date
       });
+
+      // Update user profile weight if logging weight for today
+      if (type === 'weight') {
+        const today = new Date().toISOString().slice(0, 10);
+        if (date === today) {
+          const currentData = await getUserProfileAndGoals();
+          await updateUserProfileAndGoals({
+            weight: parseFloat(value),
+            goals: currentData?.goals || [],
+            age: currentData?.profile?.age ?? null,
+            height: currentData?.profile?.height ?? null,
+            bodyFatPercentage: currentData?.profile?.bodyFatPercentage ?? null,
+            gender: currentData?.profile?.gender ?? null,
+            dietaryPreferences: currentData?.profile?.dietaryPreferences?.join(',') ?? null,
+            fitnessLevel: currentData?.profile?.fitnessLevel ?? null,
+            targetWeight: currentData?.profile?.targetWeight ?? null,
+            activityLevel: currentData?.profile?.activityLevel ?? null
+          });
+        }
+      }
       
       toast.success('Progress saved successfully!');
       if (onSuccess) onSuccess();

@@ -2,6 +2,9 @@ import React, { useContext, useState } from 'react';
 import { useData } from '../../contexts/DataContext';
 import { ProgressLineChart } from './ProgressLineChart';
 import ProgressLogDialog from './ProgressLogDialog';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { calculateBMI } from '../../utils/body-calculations';
 
 interface MetricData {
   type: string;
@@ -62,6 +65,7 @@ const ProgressTrack = () => {
     return <div className="text-center py-8 text-muted-foreground">Loading metrics...</div>;
   }
 
+
   return (
     <div className="p-4 space-y-6">
       <div className="flex justify-end mb-4">
@@ -69,78 +73,55 @@ const ProgressTrack = () => {
       </div>
       <div className="flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px]">
-          <label className="block text-sm font-medium mb-1">Metric</label>
-          <select
+          <Label htmlFor="metric-select">Metric</Label>
+          <Select 
             value={selectedMetric}
-            onChange={(e) => setSelectedMetric(e.target.value)}
-            className="w-full p-2 border rounded"
+            onValueChange={setSelectedMetric}
           >
-            {metricOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="metric-select" className="w-full">
+              <SelectValue placeholder="Select metric" />
+            </SelectTrigger>
+            <SelectContent>
+              {metricOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <p className="text-xs text-muted-foreground mt-1">
             {metricOptions.find(m => m.value === selectedMetric)?.range}
           </p>
         </div>
 
         <div className="flex-1 min-w-[200px]">
-          <label className="block text-sm font-medium mb-1">Time Range</label>
-          <select
+          <Label htmlFor="time-range-select">Time Range</Label>
+          <Select 
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="w-full p-2 border rounded"
+            onValueChange={setTimeRange}
           >
-            {timeRangeOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="time-range-select" className="w-full">
+              <SelectValue placeholder="Select time range" />
+            </SelectTrigger>
+            <SelectContent>
+              {timeRangeOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       {filteredData && filteredData.length > 0 ? (
-        <>
-          <div className="p-4 rounded-lg border">
-            <ProgressLineChart 
-              data={filteredData}
-              metric={selectedMetric}
-              unit={metricOptions.find(m => m.value === selectedMetric)?.unit || ''}
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg border">
-              <h3 className="font-medium">Starting Value</h3>
-              <p className="text-2xl">
-                {filteredData[filteredData.length - 1].value}
-                <span className="text-sm ml-1">
-                  {metricOptions.find(m => m.value === selectedMetric)?.unit}
-                </span>
-              </p>
-            </div>
-            <div className="p-4 rounded-lg border">
-              <h3 className="font-medium">Current Value</h3>
-              <p className="text-2xl">
-                {filteredData[0].value}
-                <span className="text-sm ml-1">
-                  {metricOptions.find(m => m.value === selectedMetric)?.unit}
-                </span>
-              </p>
-            </div>
-            <div className="p-4 rounded-lg border">
-              <h3 className="font-medium">Progress</h3>
-              <p className="text-2xl">
-                {filteredData && filteredData.length > 0 ? 
-                  ((filteredData[0].value - filteredData[filteredData.length - 1].value) / 
-                   filteredData[filteredData.length - 1].value * 100).toFixed(1) + '%' : 
-                  '0%'}
-              </p>
-            </div>
-          </div>
-        </>
+        <div className="p-4 rounded-lg border">
+          <ProgressLineChart 
+            data={filteredData}
+            metric={selectedMetric}
+            unit={metricOptions.find(m => m.value === selectedMetric)?.unit || ''}
+          />
+        </div>
       ) : (
         <div className="text-center py-8 text-muted-foreground">
           No data available for selected metric and time range

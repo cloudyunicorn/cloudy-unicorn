@@ -149,7 +149,6 @@ export async function getUserProfileAndGoals() {
     });
 
     if (!userData) {
-      console.log(`No user record found for auth ID: ${authId}`);
       return null;
     }
 
