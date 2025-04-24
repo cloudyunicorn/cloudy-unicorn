@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useData } from '../../contexts/DataContext';
 import { ChartAreaInteractive } from '../chart-area-interactive';
+import ProgressLogDialog from './ProgressLogDialog';
 
 interface MetricData {
   type: string;
@@ -31,11 +32,14 @@ const ProgressTrack = () => {
     ?.slice(0, timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90);
 
   if (!userMetrics) {
-    return <div className="text-center py-8 text-gray-500">Loading metrics...</div>;
+    return <div className="text-center py-8 text-muted-foreground">Loading metrics...</div>;
   }
 
   return (
     <div className="p-4 space-y-6">
+      <div className="flex justify-end mb-4">
+        <ProgressLogDialog />
+      </div>
       <div className="flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px]">
           <label className="block text-sm font-medium mb-1">Metric</label>
@@ -50,7 +54,7 @@ const ProgressTrack = () => {
               </option>
             ))}
           </select>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {metricOptions.find(m => m.value === selectedMetric)?.range}
           </p>
         </div>
@@ -73,7 +77,7 @@ const ProgressTrack = () => {
 
       {filteredData && filteredData.length > 0 ? (
         <>
-          <div className="bg-white p-4 rounded-lg shadow">
+          <div className="p-4 rounded-lg border">
             <ChartAreaInteractive 
               data={filteredData}
               metric={selectedMetric}
@@ -81,7 +85,7 @@ const ProgressTrack = () => {
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow">
+            <div className="p-4 rounded-lg border">
               <h3 className="font-medium">Starting Value</h3>
               <p className="text-2xl">
                 {filteredData[filteredData.length - 1].value}
@@ -90,7 +94,7 @@ const ProgressTrack = () => {
                 </span>
               </p>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow">
+            <div className="p-4 rounded-lg border">
               <h3 className="font-medium">Current Value</h3>
               <p className="text-2xl">
                 {filteredData[0].value}
@@ -99,7 +103,7 @@ const ProgressTrack = () => {
                 </span>
               </p>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow">
+            <div className="p-4 rounded-lg border">
               <h3 className="font-medium">Progress</h3>
               <p className="text-2xl">
                 {filteredData && filteredData.length > 0 ? 
@@ -111,7 +115,7 @@ const ProgressTrack = () => {
           </div>
         </>
       ) : (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-muted-foreground">
           No data available for selected metric and time range
         </div>
       )}

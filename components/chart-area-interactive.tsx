@@ -82,6 +82,7 @@ interface ChartAreaInteractiveProps {
     type: string;
     value: number;
     date: string;
+    id?: string;
   }>;
   metric?: string;
   unit?: string;
@@ -95,12 +96,23 @@ export function ChartAreaInteractive({
   const { data: contextData, isLoading } = useData();
   const isMobile = useIsMobile();
   
-  const fitnessData = externalData 
+  type FitnessDataItem = {
+    name: string;
+    value: number;
+    goal: number;
+    fill: string;
+    id?: string;
+    key?: string;
+  };
+
+  const fitnessData: FitnessDataItem[] = externalData 
     ? externalData.map(item => ({
         name: metric || item.type,
         value: item.value,
         goal: 0, // Will be calculated if using context data
-        fill: "hsl(var(--chart-1))"
+        fill: "hsl(var(--chart-1))",
+        id: item.id || `${item.type}-${item.date}`,
+        key: item.id || `${item.type}-${item.date}`
       }))
     : getFitnessData(contextData);
 
@@ -115,7 +127,7 @@ export function ChartAreaInteractive({
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
           {fitnessData.map((metric) => (
-            <div key={metric.name} className="flex flex-col items-center">
+            <div key={metric.id || metric.name} className="flex flex-col items-center">
               <div className="h-[120px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <RadialBarChart

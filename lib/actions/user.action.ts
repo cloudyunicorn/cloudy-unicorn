@@ -102,9 +102,39 @@ export async function getUserProfileAndGoals() {
         progressLogs: {
           orderBy: { loggedAt: 'desc' },
           select: { 
+            id: true,
             type: true,
-            value: true, 
-            loggedAt: true 
+            value: true,
+            notes: true,
+            loggedAt: true,
+            workout: {
+              select: {
+                duration: true,
+                program: {
+                  select: {
+                    title: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        workoutSessions: {
+          orderBy: { date: 'desc' },
+          select: {
+            id: true,
+            programId: true,
+            userId: true,
+            date: true,
+            duration: true,
+            completed: true,
+            notes: true,
+            exercisesLogged: true,
+            program: {
+              select: {
+                title: true
+              }
+            }
           }
         },
         workoutPrograms: {
@@ -129,7 +159,7 @@ export async function getUserProfileAndGoals() {
       stats: {
         workoutsThisWeek: userData._count.workoutSessions,
         activeChallenges: userData._count.challenges,
-        latestWeightLog: userData.progressLogs.find(log => log.type === 'weight') || null,
+        latestWeightLog: userData.progressLogs.find(log => log.type === 'WEIGHT') || null,
         metrics: userData.progressLogs.map(log => ({
           type: log.type,
           value: log.value,
@@ -137,7 +167,9 @@ export async function getUserProfileAndGoals() {
         }))
       },
       workoutPrograms: userData.workoutPrograms,
-      mealPlans: userData.mealPlans
+      mealPlans: userData.mealPlans,
+      progressLogs: userData.progressLogs,
+      workoutSessions: userData.workoutSessions
     };
 
   } catch (error) {
@@ -396,5 +428,51 @@ export async function getSavedWorkoutPrograms() {
   } catch (error) {
     console.error("Error fetching workout programs:", error);
     return { error: "Failed to fetch workout programs." };
+  }
+}
+
+// --- Save Progress Log Action ---
+export async function saveProgressLog(log: {
+  type: string;
+  value: number;
+  notes?: string;
+  date?: string;
+}) {
+  'use server';
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error("Authentication error:", authError);
+      return { error: "User not authenticated." };
+    }
+
+    const userRecord = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { id: true }
+    });
+
+    if (!userRecord) {
+      throw new Error(`User record not found for auth ID: ${user.id}`);
+    }
+
+    const loggedAt = log.date ? new Date(log.date) : new Date();
+
+    const newLog = await prisma.progressLog.create({
+      data: {
+        userId: userRecord.id,
+        type: log.type as any, // Will be validated by Prisma
+        value: log.value,
+        notes: log.notes,
+        loggedAt: loggedAt
+      }
+    });
+
+    revalidatePath('/dashboard');
+    return { success: true, log: newLog };
+  } catch (error) {
+    console.error("Error saving progress log:", error);
+    return { error: "Failed to save progress log." };
   }
 }
