@@ -21,8 +21,7 @@ const ProgressForm = ({ onSuccess }: ProgressFormProps) => {
 
   const metricOptions = [
     { value: 'weight', label: 'Weight', unit: 'kg' },
-    { value: 'bodyFat', label: 'Body Fat', unit: '%' },
-    { value: 'workout', label: 'Workout Completed', unit: '' }
+    { value: 'bodyFat', label: 'Body Fat', unit: '%' }
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,30 +32,23 @@ const ProgressForm = ({ onSuccess }: ProgressFormProps) => {
       // Convert form types to Prisma enum values
       const prismaType = type === 'bodyFat' ? 'BODY_FAT' : type.toUpperCase();
       
-      await toast.promise(
-        addProgressLog({
-          type: prismaType,
-          value: parseFloat(value),
-          notes: notes || undefined,
-          date
-        }),
-        {
-          loading: 'Saving progress...',
-          success: () => {
-            if (onSuccess) onSuccess();
-            return 'Progress saved successfully!';
-          },
-          error: (error) => {
-            console.error('Error saving progress:', error);
-            return 'Failed to save progress';
-          }
-        }
-      );
+      await addProgressLog({
+        type: prismaType,
+        value: parseFloat(value),
+        notes: notes || undefined,
+        date
+      });
+      
+      toast.success('Progress saved successfully!');
+      if (onSuccess) onSuccess();
 
       // Reset form
       setValue('');
       setNotes('');
       setDate(new Date().toISOString().slice(0, 10));
+    } catch (error) {
+      console.error('Error saving progress:', error);
+      toast.error('Failed to save progress');
     } finally {
       setIsSubmitting(false);
     }

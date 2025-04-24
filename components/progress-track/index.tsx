@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useData } from '../../contexts/DataContext';
-import { ChartAreaInteractive } from '../chart-area-interactive';
+import { ProgressLineChart } from './ProgressLineChart';
 import ProgressLogDialog from './ProgressLogDialog';
 
 interface MetricData {
@@ -11,14 +11,18 @@ interface MetricData {
 
 const ProgressTrack = () => {
   const { data } = useData();
-  const userMetrics = data?.stats?.metrics || [];
+  const userMetrics = data?.progressLogs?.map(log => ({
+    type: log.type.toLowerCase(),
+    value: log.value,
+    date: log.loggedAt.toISOString()
+  })) || [];
   const [selectedMetric, setSelectedMetric] = useState('weight');
   const [timeRange, setTimeRange] = useState('30d');
 
   const metricOptions = [
     { value: 'weight', label: 'Weight', unit: 'kg', range: 'Healthy range: 50-90kg' },
     { value: 'bodyFat', label: 'Body Fat %', unit: '%', range: 'Healthy range: 8-25%' },
-    { value: 'workouts', label: 'Workouts Completed', unit: '', range: 'Recommended: 3-5/week' }
+    { value: 'bmi', label: 'BMI', unit: '', range: 'Healthy range: 18.5-24.9' }
   ];
 
   const timeRangeOptions = [
@@ -27,9 +31,32 @@ const ProgressTrack = () => {
     { value: '90d', label: '90 Days' }
   ];
 
-  const filteredData = userMetrics
+  const now = new Date();
+  const cutoffDate = new Date(now);
+  cutoffDate.setDate(now.getDate() - (timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90));
+
+  // Get all dates in the selected range
+  const allDates = Array.from({length: timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90}, (_, i) => {
+    const date = new Date(now);
+    date.setDate(now.getDate() - i);
+    return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+  }).reverse();
+
+  // Get logged data for selected metric
+  const loggedData = userMetrics
     ?.filter(metric => metric.type === selectedMetric)
-    ?.slice(0, timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90);
+    ?.reduce((acc, metric) => {
+      const date = new Date(metric.date).toISOString().split('T')[0];
+      acc[date] = metric.value;
+      return acc;
+    }, {} as Record<string, number>);
+
+  // Create complete dataset with all dates
+  const filteredData = allDates.map(date => ({
+    date,
+    value: loggedData?.[date] ?? null,
+    type: selectedMetric
+  }));
 
   if (!userMetrics) {
     return <div className="text-center py-8 text-muted-foreground">Loading metrics...</div>;
@@ -78,7 +105,7 @@ const ProgressTrack = () => {
       {filteredData && filteredData.length > 0 ? (
         <>
           <div className="p-4 rounded-lg border">
-            <ChartAreaInteractive 
+            <ProgressLineChart 
               data={filteredData}
               metric={selectedMetric}
               unit={metricOptions.find(m => m.value === selectedMetric)?.unit || ''}

@@ -184,7 +184,6 @@ model UserChallenge {
 enum ProgressType {
   WEIGHT
   BODY_FAT
-  WORKOUT_COMPLETED
 }
 
 model ProgressLog {
