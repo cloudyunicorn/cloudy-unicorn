@@ -9,38 +9,47 @@ import {
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
+import { ArrowRight } from 'lucide-react'; // Added ArrowRight
+
 export default async function Home() {
   return (
-    <main className="flex-1 relative min-h-[calc(100vh-80px)]">
-      {/* Hero Section */}
-      <div className="flex items-center justify-center">
-        <div className="max-w-7xl px-4 py-20 mx-auto text-center">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full border shadow-sm">
+    <main className="flex-1">
+      {/* Hero Section - Enhanced Background and Padding */}
+      <div className="relative flex items-center justify-center bg-gradient-to-b from-background via-background/90 to-background">
+        {/* Optional: Add a subtle pattern or overlay here if desired */}
+        {/* <div className="absolute inset-0 bg-[url('/path/to/pattern.svg')] opacity-5"></div> */}
+        <div className="max-w-7xl px-6 py-24 md:py-32 lg:py-40 mx-auto text-center z-10">
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full border border-primary/20 bg-primary/10 shadow-sm">
             <Sparkles className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium text-primary">
               Your Ultimate Fitness Companion
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
+          {/* Enhanced Typography and Spacing */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-6">
             Achieve Your Health Goals with{' '}
-            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              CyperSculpt
+            <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              CyberSculpt
             </span>
           </h1>
 
-          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Personalized meal plans, custom workouts, AI health assessments, and
-            progress tracking—all in one platform.
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
+            Your all-in-one platform for personalized meal plans, custom workouts,
+            AI health insights, and seamless progress tracking. Start your transformation today.
           </p>
 
-          <div className="flex gap-4 justify-center">
-            <Button className="h-12 px-8 rounded-xl text-lg" asChild>
-              <Link href="/sign-up">Get Started Free</Link>
+          {/* Refined Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="h-12 px-8 rounded-full text-base font-semibold group" asChild>
+              <Link href="/sign-up">
+                Get Started Free <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Link>
             </Button>
             <Button
               variant="outline"
-              className="h-12 px-8 rounded-xl text-lg"
+              size="lg"
+              className="h-12 px-8 rounded-full text-base font-semibold"
               asChild
             >
               <Link href="/sign-in">Sign In</Link>
@@ -49,35 +58,35 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* Features Grid */}
-      <div className="py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-16">
-            Core Features
+      {/* Features Grid - Updated Styling */}
+      <div className="py-20 lg:py-24 bg-background/80"> {/* Slightly different background */}
+        <div className="max-w-7xl mx-auto px-6"> {/* Adjusted padding */}
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 tracking-tight"> {/* Refined title */}
+            Everything You Need to Succeed
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"> {/* Adjusted lg breakpoint */}
             {[
               {
-                icon: <Apple className="h-8 w-8" />,
+                icon: <Apple className="h-10 w-10" />,
                 title: 'Personalized Meal Plans',
                 description:
                   'Tailored nutrition guides based on your goals and preferences.',
               },
               {
-                icon: <Dumbbell className="h-8 w-8" />,
+                icon: <Dumbbell className="h-10 w-10" />,
                 title: 'Custom Workout Programs',
                 description:
                   'Exercise routines designed for your fitness level and schedule.',
               },
               {
-                icon: <ClipboardCheck className="h-8 w-8" />,
+                icon: <ClipboardCheck className="h-10 w-10" />,
                 title: 'Habit‑Changing Challenges',
                 description:
                   'Daily and weekly challenges to build lasting healthy habits.',
               },
               {
-                icon: <BarChart className="h-8 w-8" />,
+                icon: <BarChart className="h-10 w-10" />,
                 title: 'Progress Tracking',
                 description:
                   'Monitor workouts, meals, and habits with intuitive charts.',
@@ -85,13 +94,14 @@ export default async function Home() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className="p-8 rounded-xl border bg-card hover:shadow-lg transition-shadow"
+                // Enhanced card styling
+                className="p-6 rounded-2xl border border-border/50 bg-card hover:bg-muted/50 hover:shadow-md transition-all duration-300 flex flex-col items-start"
               >
-                <div className="mb-4 text-primary">{feature.icon}</div>
-                <h3 className="text-xl font-semibold mb-2">
+                <div className="mb-5 text-primary p-3 bg-primary/10 rounded-lg">{feature.icon}</div> {/* Icon background */}
+                <h3 className="text-lg font-semibold mb-2"> {/* Adjusted font size */}
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-sm text-muted-foreground"> {/* Adjusted font size */}
                   {feature.description}
                 </p>
               </div>
@@ -100,25 +110,25 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+      {/* CTA Section - Enhanced Styling */}
+      <div className="py-20 lg:py-24 bg-gradient-to-t from-background/50 via-background/10 to-transparent"> {/* Added gradient */}
+        <div className="max-w-4xl mx-auto px-6 text-center"> {/* Adjusted padding */}
           <div className="inline-flex items-center gap-2 mb-4 text-primary">
             <CheckCircle className="h-6 w-6" />
-            <span className="font-medium">
+            <span className="text-sm font-medium"> {/* Adjusted font size */}
               Trusted by 10,000+ Fitness Enthusiasts
             </span>
           </div>
-          <h2 className="text-3xl font-bold mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6"> {/* Refined title */}
             Ready to Transform Your Life?
           </h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Join thousands already hitting their goals with CyberSculpt.
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"> {/* Adjusted text & spacing */}
+            Join thousands already achieving their fitness goals with CyberSculpt's personalized approach.
           </p>
-          <Button className="h-14 px-12 rounded-xl text-lg gap-2" asChild>
+          {/* Updated Button to match Hero */}
+          <Button size="lg" className="h-12 px-8 rounded-full text-base font-semibold group" asChild>
             <Link href="/sign-up">
-              <Sparkles className="h-5 w-5" />
-              Start Free Trial
+              Start Your Free Trial <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" /> {/* Added Arrow */}
             </Link>
           </Button>
         </div>
