@@ -1,9 +1,27 @@
 import Image from 'next/image';
 import React from 'react';
-import logo from '@/assets/logo.png';
+import logoBlack from '@/assets/Logo/vector/default-monochrome-black.svg';
+import logoWhite from '@/assets/Logo/vector/default-monochrome-white.svg';
 
-const Logo = () => {
-  return <Image src={logo} alt="CyberSculpt" height={40} />;
+const Logo = ({ height = 40 }: { height?: number }) => {
+  return (
+    <>
+      {/* Light mode logo */}
+      <Image
+        src={logoBlack}
+        alt="CyberSculpt"
+        height={height}
+        className="block dark:hidden"
+      />
+      {/* Dark mode logo */}
+      <Image
+        src={logoWhite}
+        alt="CyberSculpt"
+        height={height}
+        className="hidden dark:block"
+      />
+    </>
+  );
 };
 
 export default Logo;
