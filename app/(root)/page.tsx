@@ -43,7 +43,7 @@ export default async function Home() {
               className="h-12 px-8 rounded-xl text-lg"
               asChild
             >
-              <Link href="/demo">Watch Demo</Link>
+              <Link href="/sign-in">Sign In</Link>
             </Button>
           </div>
         </div>

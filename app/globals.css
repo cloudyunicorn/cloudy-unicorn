@@ -16,7 +16,7 @@
     --secondary-foreground: 240 10% 20%;
     --muted: 220 14% 90%; /* Soft muted blue */
     --muted-foreground: 220 8% 46%;
-    --accent: 210 80% 60%; /* Bright accent blue */
+    --accent: 230 76% 58%; /* Bright accent blue */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%; /* Clean red */
     --destructive-foreground: 0 0% 100%;
@@ -53,7 +53,7 @@
     --secondary-foreground: 0 0% 95%;
     --muted: 240 10% 30%; /* Muted navy */
     --muted-foreground: 240 10% 70%;
-    --accent: 210 80% 60%; /* Bright accent blue */
+    --accent: 230 76% 58%; /* Bright accent blue */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;

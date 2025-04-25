@@ -19,7 +19,7 @@ import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 const Menu = () => {
   const supabase = useSupabase();
   const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // Removed isLoading state
 
   useEffect(() => {
     async function getSession() {
@@ -35,7 +35,7 @@ const Menu = () => {
         } else {
           setSession(session);
         }
-        setIsLoading(false); // Reset loading state on auth changes
+        // Removed setIsLoading(false) here - loading state is handled by the form now
       }
     );
 
@@ -49,13 +49,10 @@ const Menu = () => {
       <nav className="hidden md:flex w-full max-w-xs gap-1">
         {!session && (
           <>
-            <Button asChild variant="ghost" disabled={isLoading}>
-              <Link href="/sign-in" onClick={() => setIsLoading(true)}>
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  'Sign In'
-                )}
+            {/* Removed isLoading state and onClick handler */}
+            <Button asChild variant="ghost">
+              <Link href="/sign-in">
+                Sign In
               </Link>
             </Button>
             <Button asChild variant="ghost">
@@ -76,13 +73,10 @@ const Menu = () => {
             <SheetTitle>Menu</SheetTitle>
             {!session && (
               <>
-                <Button asChild variant="ghost" disabled={isLoading}>
-                  <Link href="/sign-in" onClick={() => setIsLoading(true)}>
-                    {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      'Sign In'
-                    )}
+                {/* Removed isLoading state and onClick handler */}
+                <Button asChild variant="ghost">
+                  <Link href="/sign-in">
+                    Sign In
                   </Link>
                 </Button>
                 <Button asChild variant="ghost">
