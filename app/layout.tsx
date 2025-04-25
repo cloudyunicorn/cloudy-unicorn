@@ -11,7 +11,7 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: 'CyberSculpt',
-  description: 'The fastest way to grow your social media engagement.',
+  description: 'The fastest way to improve your health.',
 };
 
 const geistSans = Geist({

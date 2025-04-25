@@ -113,7 +113,7 @@ export default async function Home() {
             Ready to Transform Your Life?
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands already hitting their goals with FitTrack.
+            Join thousands already hitting their goals with CyberSculpt.
           </p>
           <Button className="h-14 px-12 rounded-xl text-lg gap-2" asChild>
             <Link href="/sign-up">
