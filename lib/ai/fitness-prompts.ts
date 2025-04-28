@@ -25,7 +25,7 @@ Calculate appropriate calorie and macronutrient ranges based on the provided bod
 User query: ${query}
 
 Respond with:
-1. 3 meal suggestions with ingredients
+1. 3 meal suggestions with ingredients and detailed recipe
 2. Detailed nutritional breakdown (calories, protein, carbs, fats, fiber)
 3. Preparation time and difficulty
 4. Notes on how these meals align with the user's body metrics and goals`;
