@@ -45,20 +45,10 @@ import {
   getUserProfileAndGoals,
 } from '@/lib/actions/user.action';
 import { toast } from 'sonner';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Spinner } from '@/components/ui/spinner';
 
-const fitnessGoalEnum = FitnessGoal || {
-  WEIGHT_LOSS: 'WEIGHT_LOSS',
-  MUSCLE_GAIN: 'MUSCLE_GAIN',
-  MAINTENANCE: 'MAINTENANCE',
-  ENDURANCE: 'ENDURANCE',
-  FLEXIBILITY: 'FLEXIBILITY',
-};
-const difficultyLevelEnum = DifficultyLevel || {
-  BEGINNER: 'BEGINNER',
-  INTERMEDIATE: 'INTERMEDIATE',
-  ADVANCED: 'ADVANCED',
-};
+const fitnessGoalEnum = FitnessGoal;
+const difficultyLevelEnum = DifficultyLevel;
 
 const bodyInfoSchema = z.object({
   age: z.coerce.number().int().positive().optional().nullable(),
@@ -192,36 +182,19 @@ export function BodyInfoDialog() {
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Body Information & Goals</DialogTitle>
-          <DialogDescription>
-            {isLoadingData
-              ? 'Loading...'
-              : initialData?.profile
-                ? 'Review or update'
-                : 'Provide'}{' '}
-            your current body metrics and fitness goals.
+          <DialogDescription className="flex items-center gap-2">
+            {isLoadingData ? (
+              <>
+                <Spinner className="h-4 w-4" />
+                <span>Loading your body info...</span>
+              </>
+            ) : (
+              <>
+                {initialData?.profile ? 'Review or update' : 'Provide'} your current body metrics and fitness goals.
+              </>
+            )}
           </DialogDescription>
         </DialogHeader>
-        {isLoadingData ? (
-          <div className="space-y-6 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[...Array(7)].map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </div>
-            <div>
-              <Skeleton className="h-6 w-1/3 mb-2" />
-              <div className="grid grid-cols-2 gap-4">
-                {[...Array(5)].map((_, i) => (
-                  <Skeleton key={i} className="h-6 w-full" />
-                ))}
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-4">
-              <Skeleton className="h-10 w-20" />
-              <Skeleton className="h-10 w-24" />
-            </div>
-          </div>
-        ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -512,8 +485,8 @@ export function BodyInfoDialog() {
               </DialogFooter>
             </form>
           </Form>
-        )}
       </DialogContent>
     </Dialog>
   );
 }
+
