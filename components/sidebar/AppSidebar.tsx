@@ -25,9 +25,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { NavMain } from './nav-main';
-import { NavDocuments } from './nav-documents';
-import Image from 'next/image';
-import Logo from '@/assets/logo.png';
+import Logo from '@/components/Logo';
 import { NavSecondary } from './nav-secondary-';
 import { NavUser } from './nav-user';
 import Dashboard from "@/app/dashboard/page";
@@ -135,8 +133,7 @@ export function AppSidebar({
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#">
-                <Image src={Logo} alt="cloudyunicorn" height={20} />
-                <span className="text-base font-semibold">CyberSculpt</span>
+                <Logo height={30} />
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
