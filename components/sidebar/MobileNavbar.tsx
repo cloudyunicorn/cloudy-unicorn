@@ -20,7 +20,7 @@ const MobileNavbar = ({ activeItem, onSelectComponent }: MobileNavbarProps) => {
   if (!isMobile) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-lg">
+    <div className="fixed left-1/2 -translate-x-1/2 bottom-4 z-50 bg-background border border-border shadow-lg rounded-xl">
       <div className="flex justify-around items-center h-16">
         {data.navMain.map((item: NavItem) => (
           <button
