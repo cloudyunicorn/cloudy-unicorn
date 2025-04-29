@@ -6,7 +6,6 @@ import './globals.css';
 import { SupabaseProvider } from '@/providers/supabase-provider';
 import { Toaster } from 'sonner';
 import { useEffect, useState } from 'react';
-import Head from 'next/head';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -51,12 +50,14 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={`${geistSans.className} antialiased`} suppressHydrationWarning>
-      <Head>
+      <head>
         <title>CyberSculpt</title>
         <meta name="description" content="The fastest way to improve your health." />
         <meta property="og:url" content={defaultUrl} />
         <link rel="canonical" href={defaultUrl} />
-      </Head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#000000" />
+      </head>
       <SupabaseProvider>
         <body>
           <ThemeProvider
