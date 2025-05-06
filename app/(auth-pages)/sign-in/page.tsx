@@ -65,7 +65,9 @@ export default function SignInPage() {
         )}
 
         <SignInForm
-          onSuccess={() => router.push('/dashboard')}
+          onSuccess={() => {
+            router.push('/dashboard');
+          }}
           onError={(message) => setErrorMsg(message)}
         />
 

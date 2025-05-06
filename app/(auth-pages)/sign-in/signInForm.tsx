@@ -48,9 +48,8 @@ export function SignInForm({ onSuccess, onError }: SignInFormProps) {
       await signInAction(values);
       onSuccess();
     } catch (error) {
-      onError(error instanceof Error ? error.message : 'Sign in failed');
-    } finally {
       setIsLoading(false);
+      onError(error instanceof Error ? error.message : 'Sign in failed');
     }
   };
 
