@@ -34,6 +34,7 @@ import WorkoutPlans from "../workout-plans";
 import Habits from "../habits";
 import HealthAssessments from "../health-assessments.tsx";
 import ProgressTrack from "../progress-track";
+import { UserSettings } from "../settings";
 
 export interface NavItem {
   title: string;
@@ -84,7 +85,7 @@ export const data = {
   navSecondary: [
     {
       title: 'Settings',
-      url: '/settings',
+      component: UserSettings,
       icon: SettingsIcon,
     },
     {
@@ -143,7 +144,12 @@ export function AppSidebar({
         {/* Pass onSelectComponent so NavMain can trigger inline component changes if needed */}
         <NavMain items={data.navMain} activeItem={activeItem} onSelectComponent={onSelectComponent} />
         {/* <NavDocuments items={data.documents} /> */}
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavSecondary 
+          items={data.navSecondary} 
+          activeItem={activeItem}
+          onSelectComponent={onSelectComponent}
+          className="mt-auto" 
+        />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

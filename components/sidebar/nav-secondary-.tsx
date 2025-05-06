@@ -1,42 +1,72 @@
-"use client"
 
-import * as React from "react"
-import { LucideIcon } from "lucide-react"
-
+import React from 'react';
+import { type LucideIcon } from 'lucide-react';
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
+
+interface NavItem {
+  title: string;
+  url?: string;
+  component?: React.ComponentType<any>;
+  icon?: LucideIcon;
+}
+
+interface NavSecondaryProps {
+  items: NavItem[];
+  activeItem: string | null;
+  onSelectComponent: (
+    title: string,
+    callback: () => React.ComponentType<any> | null
+  ) => void;
+  className?: string;
+}
 
 export function NavSecondary({
   items,
-  ...props
-}: {
-  items: {
-    title: string
-    url: string
-    icon: LucideIcon
-  }[]
-} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+  activeItem,
+  onSelectComponent,
+  className,
+}: NavSecondaryProps) {
   return (
-    <SidebarGroup {...props}>
-      <SidebarGroupContent>
+    <SidebarGroup className={className}>
+      <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
-                <a href={item.url}>
-                  <item.icon />
+              {item.url ? (
+                <SidebarMenuButton tooltip={item.title} asChild>
+                  <a href={item.url}>
+                    {item.icon && <item.icon size={20} />}
+                    <span>{item.title}</span>
+                  </a>
+                </SidebarMenuButton>
+              ) : (
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  onClick={() => {
+                    if (item.component) {
+                      onSelectComponent(item.title, () => item.component!);
+                    }
+                  }}
+                  className={`${
+                    activeItem === item.title
+                      ? 'bg-sidebar-select'
+                      : ''
+                  }`}
+                >
+                  {item.icon && <item.icon size={20} />}
                   <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              )}
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }
