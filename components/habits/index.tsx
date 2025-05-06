@@ -87,7 +87,7 @@ const Habits = () => {
               onChange={(e) =>
                 setContext({
                   ...context,
-                  goals: e.target.value.split(',').map((item) => item.trim()),
+                  goals: [e.target.value],
                 })
               }
               className="h-10"
