@@ -6,6 +6,15 @@ import './globals.css';
 import { SupabaseProvider } from '@/providers/supabase-provider';
 import { Toaster } from 'sonner';
 import { useEffect, useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -69,12 +78,22 @@ export default function RootLayout({
             <main>{children}</main>
             <Toaster position="top-center" richColors />
             {showInstall && (
-              <button
-                onClick={handleInstallClick}
-                className="fixed bottom-4 right-4 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50"
-              >
-                Install App
-              </button>
+              <Dialog open={showInstall} onOpenChange={setShowInstall}>
+                <DialogContent className="fixed m-auto h-fit max-h-[90vh] w-[90vw] max-w-md rounded-lg z-50 overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Install CyberSculpt</DialogTitle>
+                  </DialogHeader>
+                  <div className="flex flex-col gap-4">
+                    <p>Add CyberSculpt to your home screen for a better experience!</p>
+                    <div className="flex justify-end gap-2">
+                      <DialogClose asChild>
+                        <Button variant="outline">Later</Button>
+                      </DialogClose>
+                      <Button onClick={handleInstallClick}>Install</Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
           </ThemeProvider>
         </body>
