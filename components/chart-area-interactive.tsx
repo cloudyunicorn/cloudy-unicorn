@@ -1,15 +1,8 @@
 "use client"
 
-import * as React from "react"
-import { RadialBar, RadialBarChart, ResponsiveContainer } from "recharts"
+import { Dumbbell, Utensils, Scale } from "lucide-react"
 import { useData } from "@/contexts/DataContext"
-import { 
-  calculateBMI, 
-  getHealthyWeightRange,
-  getSuggestedCalories,
-  calculateBMR
-} from "@/utils/body-calculations"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { calculateBMI } from "@/utils/body-calculations"
 import {
   Card,
   CardContent,
@@ -17,151 +10,89 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
 
-const getFitnessData = (userData: any) => {
-  if (!userData?.profile) return [];
+export function ChartAreaInteractive() {
+  const { data: userData } = useData();
+  const profile = userData?.profile;
+  const stats = userData?.stats;
 
-  const { age, weight, height, gender, activityLevel } = userData.profile;
-  if (!weight || !height || !age || !gender) return [];
-
-  const bmi = calculateBMI(weight, height);
-  const [minWeight, maxWeight] = getHealthyWeightRange(height);
-  const bmr = calculateBMR({
-    weight,
-    height,
-    age,
-    gender: gender.toLowerCase() as 'male' | 'female',
-    activityLevel
-  });
-  const suggestedCalories = getSuggestedCalories(bmr, activityLevel);
-
-  return [
-    {
-      name: "BMI",
-      value: parseFloat(bmi.toFixed(1)),
-      goal: 22, // Ideal BMI
-      fill: "hsl(var(--chart-1))"
-    },
-    {
-      name: "Weight",
-      value: weight,
-      goal: (minWeight + maxWeight) / 2, // Midpoint of healthy range
-      fill: "hsl(var(--chart-2))"
-    },
-    {
-      name: "Calories",
-      value: userData.stats?.dailyCalories || 0,
-      goal: suggestedCalories,
-      fill: "hsl(var(--chart-3))"
-    },
-    {
-      name: "Workouts",
-      value: userData.stats?.workoutsThisWeek || 0,
-      goal: activityLevel === 'SEDENTARY' ? 3 : 5,
-      fill: "hsl(var(--chart-4))"
-    },
-    {
-      name: "Body Fat",
-      value: userData.profile.bodyFatPercentage || 0,
-      goal: gender === 'MALE' ? 15 : 25, // Ideal body fat %
-      fill: "hsl(var(--chart-5))"
-    },
-    {
-      name: "Water",
-      value: userData.stats?.waterIntake || 0,
-      goal: 2.5, // Liters
-      fill: "hsl(var(--chart-6))"
-    }
-  ].filter(item => item.value !== undefined);
-};
-
-
-interface ChartAreaInteractiveProps {
-  data?: Array<{
-    type: string;
-    value: number;
-    date: string;
-    id?: string;
-  }>;
-  metric?: string;
-  unit?: string;
-}
-
-export function ChartAreaInteractive({ 
-  data: externalData, 
-  metric, 
-  unit 
-}: ChartAreaInteractiveProps = {}) {
-  const { data: contextData, isLoading } = useData();
-  const isMobile = useIsMobile();
-  
-  type FitnessDataItem = {
-    name: string;
-    value: number;
-    goal: number;
-    fill: string;
-    id?: string;
-    key?: string;
-  };
-
-  const fitnessData: FitnessDataItem[] = externalData 
-    ? externalData.map(item => ({
-        name: metric || item.type,
-        value: item.value,
-        goal: 0, // Will be calculated if using context data
-        fill: "hsl(var(--chart-1))",
-        id: item.id || `${item.type}-${item.date}`,
-        key: item.id || `${item.type}-${item.date}`
-      }))
-    : getFitnessData(contextData);
+  const workoutsSaved = userData?.workoutPrograms?.length || 0;
+  const mealsSaved = userData?.mealPlans?.length || 0;
+  const bmi = profile?.weight && profile?.height 
+    ? calculateBMI(profile.weight, profile.height) 
+    : null;
 
   return (
-    <Card className="@container/card">
+    <Card>
       <CardHeader>
-        <CardTitle>Fitness Dashboard</CardTitle>
+        <CardTitle>Fitness Summary</CardTitle>
         <CardDescription>
-          Overview of your health and fitness metrics
+          Your key fitness metrics at a glance
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          {fitnessData.map((metric) => (
-            <div key={metric.id || metric.name} className="flex flex-col items-center">
-              <div className="h-[120px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart
-                    innerRadius="60%"
-                    outerRadius="100%"
-                    data={[metric]}
-                    startAngle={90}
-                    endAngle={-270}
-                  >
-                    <RadialBar
-                      background
-                      dataKey="goal"
-                      fill="hsl(var(--muted))"
-                      opacity={0.2}
-                    />
-                    <RadialBar
-                      dataKey="value"
-                      fill={metric.fill}
-                      cornerRadius={4}
-                    />
-                  </RadialBarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-2 text-center">
-                <p className="text-sm font-medium">{metric.name}</p>
-                <p className={cn(
-                  "text-sm",
-                  metric.value >= metric.goal ? "text-green-500" : "text-amber-500"
-                )}>
-                  {metric.value} / {metric.goal}
-                </p>
-              </div>
+      <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {/* Workouts Saved */}
+        <div className="flex flex-col gap-2 p-4 border rounded-lg">
+          <div className="flex items-center gap-2">
+            <Dumbbell className="w-5 h-5 text-primary" />
+            <h3 className="font-medium">Workouts Saved</h3>
+          </div>
+          <div className="text-2xl font-bold">{workoutsSaved}</div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-primary h-2 rounded-full" 
+              style={{ width: `${Math.min(workoutsSaved * 10, 100)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Meals Saved */}
+        <div className="flex flex-col gap-2 p-4 border rounded-lg">
+          <div className="flex items-center gap-2">
+            <Utensils className="w-5 h-5 text-primary" />
+            <h3 className="font-medium">Meals Saved</h3>
+          </div>
+          <div className="text-2xl font-bold">{mealsSaved}</div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-primary h-2 rounded-full" 
+              style={{ width: `${Math.min(mealsSaved * 10, 100)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Body Metrics */}
+        <div className="flex flex-col gap-2 p-4 border rounded-lg">
+          <div className="flex items-center gap-2">
+            <Scale className="w-5 h-5 text-primary" />
+            <h3 className="font-medium">Body Metrics</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <p className="text-sm text-muted-foreground">Weight</p>
+              <p className="font-medium">
+                {profile?.weight ? `${profile.weight} kg` : '-'}
+              </p>
             </div>
-          ))}
+            <div>
+              <p className="text-sm text-muted-foreground">Height</p>
+              <p className="font-medium">
+                {profile?.height ? `${profile.height} cm` : '-'}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">BMI</p>
+              <p className="font-medium">
+                {bmi ? bmi.toFixed(1) : '-'}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Workouts</p>
+              <p className="font-medium">
+                {stats?.workoutsThisWeek || 0} this week
+              </p>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
