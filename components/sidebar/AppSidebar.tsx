@@ -90,12 +90,12 @@ export const data = {
     },
     {
       title: 'Get Help',
-      url: '/help',
+      url: '/',
       icon: HelpCircleIcon,
     },
     {
       title: 'Search',
-      url: '/search',
+      url: '/',
       icon: SearchIcon,
     },
   ],
