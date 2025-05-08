@@ -86,7 +86,14 @@ export const SavedWorkoutsList = ({ onSave }: SavedWorkoutsListProps) => {
                 strong: ({node, ...props}) => <strong className="font-semibold" {...props} />,
                 em: ({node, ...props}) => <em className="italic" {...props} />,
                 hr: ({node, ...props}) => <hr className="my-4 border-gray-200" {...props} />,
-                a: ({node, ...props}) => <a className="text-blue-500 hover:underline" {...props} />,
+                a: ({node, ...props}) => (
+                  <a 
+                    className="text-blue-500 hover:underline" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    {...props} 
+                  />
+                ),
               }}
             >
               {selectedProgram?.description}

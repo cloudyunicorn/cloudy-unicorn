@@ -218,6 +218,14 @@ const WorkoutPlans = () => {
                       hr: ({ node, ...props }) => (
                         <hr className="my-4 border-gray-200" {...props} />
                       ),
+                      a: ({ node, ...props }) => (
+                        <a 
+                          className="text-blue-600 underline hover:text-blue-800" 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          {...props} 
+                        />
+                      ),
                     }}
                   >
                     {workoutPlan}
