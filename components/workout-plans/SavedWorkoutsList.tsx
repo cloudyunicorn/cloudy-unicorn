@@ -53,7 +53,9 @@ export const SavedWorkoutsList = ({ onSave }: SavedWorkoutsListProps) => {
                     className="mt-2 text-sm line-clamp-2 cursor-pointer hover:text-primary"
                     onClick={() => setSelectedProgram(program)}
                   >
-                    {program.description.substring(0, 100)}...
+                    {program.description.includes('**') 
+                      ? program.description.split('**')[1].split('\n')[0].trim()
+                      : program.description.substring(0, 100) + '...'}
                   </p>
                 </div>
               ))}
