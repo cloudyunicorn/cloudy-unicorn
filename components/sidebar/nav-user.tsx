@@ -32,6 +32,13 @@ import {
 import { useEffect, useState } from 'react';
 import { UserMetadata } from "@supabase/supabase-js";
 
+function getInitials(name?: string) {
+  if (!name) return 'US';
+  const parts = name.split(' ');
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
+
 export function NavUser() {
   const [userData, setUserData] = useState<UserMetadata | null>(null);
   const { isMobile } = useSidebar();
@@ -56,10 +63,10 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{getInitials(userData?.name)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{userData?.full_name}</span>
+                <span className="truncate font-medium">{userData?.name}</span>
                 <span className="truncate text-xs text-muted-foreground">
                   {userData?.email}
                 </span>
@@ -77,10 +84,10 @@ export function NavUser() {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{getInitials(userData?.name)}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{userData?.full_name}</span>
+                  <span className="truncate font-medium">{userData?.name}</span>
                   <span className="truncate text-xs text-muted-foreground">
                     {userData?.email}
                   </span>
