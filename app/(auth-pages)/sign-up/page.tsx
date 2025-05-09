@@ -84,7 +84,7 @@ export default function SignUpPage() {
               className="text-foreground hover:text-primary px-1 h-auto font-medium"
               asChild
             >
-              <a href="/sign-in">Sign in here</a>
+              <Link href="/sign-in">Sign in here</Link>
             </Button>
           </p>
         </div>

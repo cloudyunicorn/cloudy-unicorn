@@ -25,9 +25,9 @@ export async function signOutAction() {
 
 export async function signInAction(values: FormValues) {
   const supabase = await createClient();
-    const { error } = await supabase.auth.signInWithPassword(values);
-    if (error) {
-    return { error: error.message };
+  const { error } = await supabase.auth.signInWithPassword(values);
+  if (error) {
+    throw new Error(error.message);
   }
   return { success: true };
 }

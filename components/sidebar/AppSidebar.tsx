@@ -35,6 +35,7 @@ import Habits from "../habits";
 import HealthAssessments from "../health-assessments.tsx";
 import ProgressTrack from "../progress-track";
 import { UserSettings } from "../settings";
+import Link from "next/link";
 
 export interface NavItem {
   title: string;
@@ -133,9 +134,9 @@ export function AppSidebar({
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <Link href="#">
                 <Logo height={30} />
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

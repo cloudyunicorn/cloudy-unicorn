@@ -8,6 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import Link from "next/link";
 
 interface NavItem {
   title: string;
@@ -40,10 +41,10 @@ export function NavSecondary({
             <SidebarMenuItem key={item.title}>
               {item.url ? (
                 <SidebarMenuButton tooltip={item.title} asChild>
-                  <a href={item.url}>
+                  <Link href={item.url}>
                     {item.icon && <item.icon size={20} />}
                     <span>{item.title}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               ) : (
                 <SidebarMenuButton

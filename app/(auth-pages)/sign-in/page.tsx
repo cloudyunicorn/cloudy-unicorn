@@ -79,7 +79,7 @@ export default function SignInPage() {
               className="text-foreground hover:text-primary px-1 h-auto font-medium"
               asChild
             >
-              <a href="/sign-up">Create account</a>
+              <Link href="/sign-up">Create account</Link>
             </Button>
           </p>
           <Button
@@ -87,7 +87,7 @@ export default function SignInPage() {
             className="text-muted-foreground hover:text-foreground h-auto text-xs"
             asChild
           >
-            <a href="/forgot-password">Forgot password?</a>
+            <Link href="/forgot-password">Forgot password?</Link>
           </Button>
         </div>
       </Card>
