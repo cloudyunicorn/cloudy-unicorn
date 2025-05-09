@@ -20,7 +20,9 @@ const Logo = ({ height = 40 }: { height?: number }) => {
         height={height}
         className="hidden dark:block"
       /> */}
-      <p className="text-xl font-semibold">Cloudy Unicorn</p>
+      <p className="text-xl font-semibold bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
+        Cloudy Unicorn
+      </p>
     </div>
   );
 };

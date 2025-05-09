@@ -6,20 +6,21 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Suspense, useEffect, useState } from 'react'
 import { getUserInfo } from '@/lib/actions/user.action'
+import { UserMetadata } from "@supabase/supabase-js"
 
 interface User {
   email?: string;
 }
 
 export function UserSettings() {
-  const [user, setUser] = useState<User | null>(null)
+  const [userData, setUserData] = useState<UserMetadata | null>(null);
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userData = await getUserInfo()
-        setUser(userData)
+        const fetchedData = await getUserInfo();
+        setUserData(fetchedData.user_metadata)
       } catch (error) {
         console.error('Failed to fetch user:', error)
       } finally {
@@ -55,11 +56,22 @@ export function UserSettings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              type="name"
+              className="w-auto"
+              value={userData?.name || ''}
+              readOnly
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
-              value={user?.email || ''}
+              className="w-auto"
+              value={userData?.email || ''}
               readOnly
             />
           </div>
