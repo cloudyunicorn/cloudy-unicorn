@@ -54,7 +54,9 @@ export const MealPlansList = ({ onSave }: MealPlansListProps) => {
                     className="mt-2 text-sm line-clamp-2 cursor-pointer hover:text-primary"
                     onClick={() => setSelectedPlan(plan)}
                   >
-                    {plan.description?.substring(0, 100) || 'No description'}...
+                    {plan.description?.includes('**') 
+                      ? plan.description?.split('**')[1].split('\n')[0].trim()
+                      : plan.description?.substring(0, 100) + '...'}
                   </p>
                 </div>
               ))}
