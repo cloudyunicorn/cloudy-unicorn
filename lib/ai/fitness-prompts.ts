@@ -59,7 +59,7 @@ Respond with:
 2. 3-5 exercises with:
    - Name and description
    - Sets/reps adjusted for body metrics
-   - YouTube video link demonstrating proper form (search for "exercise name proper form")
+   - YouTube video search link demonstrating proper form (search for "exercise name proper form")
 3. Cool-down suggestions
 4. Notes on how this workout aligns with the user's physical characteristics`;
 };

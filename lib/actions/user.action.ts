@@ -475,3 +475,75 @@ export async function saveProgressLog(log: {
     return { error: "Failed to save progress log." };
   }
 }
+
+// --- Delete Meal Plan Action ---
+export async function deleteMealPlan(planId: string) {
+  'use server';
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error("Authentication error:", authError);
+      return { error: "User not authenticated." };
+    }
+
+    const userRecord = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { id: true }
+    });
+
+    if (!userRecord) {
+      throw new Error(`User record not found for auth ID: ${user.id}`);
+    }
+
+    await prisma.mealPlan.delete({
+      where: {
+        id: planId,
+        userId: userRecord.id
+      }
+    });
+
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting meal plan:", error);
+    return { error: "Failed to delete meal plan." };
+  }
+}
+
+// --- Delete Workout Plan Action ---
+export async function deleteWorkoutPlan(planId: string) {
+  'use server';
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error("Authentication error:", authError);
+      return { error: "User not authenticated." };
+    }
+
+    const userRecord = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { id: true }
+    });
+
+    if (!userRecord) {
+      throw new Error(`User record not found for auth ID: ${user.id}`);
+    }
+
+    await prisma.workoutProgram.delete({
+      where: {
+        id: planId,
+        userId: userRecord.id
+      }
+    });
+
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting workout plan:", error);
+    return { error: "Failed to delete workout plan." };
+  }
+}

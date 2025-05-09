@@ -2,9 +2,14 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { Ghost, Trash2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useData } from '@/contexts/DataContext';
+import { deleteWorkoutPlan } from '@/lib/actions/user.action';
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export type WorkoutProgram = {
   id: string;
@@ -25,6 +30,28 @@ type SavedWorkoutsListProps = {
 export const SavedWorkoutsList = ({ onSave }: SavedWorkoutsListProps) => {
   const { data, isLoading, error, refetch } = useData();
   const [selectedProgram, setSelectedProgram] = useState<WorkoutProgram | null>(null);
+  const [programToDelete, setProgramToDelete] = useState<WorkoutProgram | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const handleDelete = async () => {
+    if (!programToDelete) return;
+    setIsDeleting(true);
+    
+    try {
+      const result = await deleteWorkoutPlan(programToDelete.id);
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+      toast.success('Workout plan deleted successfully');
+      setProgramToDelete(null);
+      await refetch();
+    } catch (err) {
+      console.error('Failed to delete workout program:', err);
+      toast.error('Failed to delete workout plan');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="mx-6 w-full">
@@ -48,6 +75,16 @@ export const SavedWorkoutsList = ({ onSave }: SavedWorkoutsListProps) => {
                         {new Date(program.createdAt).toLocaleDateString()}
                       </p>
                     </div>
+                    <Button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setProgramToDelete(program);
+                      }}
+                      variant="ghost"
+                      aria-label="Delete workout program"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                   <p 
                     className="mt-2 text-sm line-clamp-2 cursor-pointer hover:text-primary"
@@ -100,6 +137,37 @@ export const SavedWorkoutsList = ({ onSave }: SavedWorkoutsListProps) => {
             >
               {selectedProgram?.description}
             </ReactMarkdown>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!programToDelete} onOpenChange={(open) => !open && setProgramToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Workout Program</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-600">
+            Are you sure you want to delete "{programToDelete?.title}"? This action cannot be undone.
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              onClick={() => setProgramToDelete(null)}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDelete}
+              variant="destructive"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <div className="flex items-center gap-2">
+                  <Spinner className="w-4 h-4" />
+                  Deleting...
+                </div>
+              ) : 'Delete'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

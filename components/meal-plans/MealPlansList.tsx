@@ -2,9 +2,14 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { Trash2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useData } from '@/contexts/DataContext';
+import { deleteMealPlan } from '@/lib/actions/user.action';
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export type MealPlan = {
   id: string;
@@ -26,6 +31,28 @@ type MealPlansListProps = {
 export const MealPlansList = ({ onSave }: MealPlansListProps) => {
   const { data, isLoading, error, refetch } = useData();
   const [selectedPlan, setSelectedPlan] = useState<MealPlan | null>(null);
+  const [planToDelete, setPlanToDelete] = useState<MealPlan | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const handleDelete = async () => {
+    if (!planToDelete) return;
+    setIsDeleting(true);
+    
+    try {
+      const result = await deleteMealPlan(planToDelete.id);
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+      toast.success('Meal plan deleted successfully');
+      setPlanToDelete(null);
+      await refetch();
+    } catch (err) {
+      console.error('Failed to delete plan:', err);
+      toast.error('Failed to delete meal plan');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="mx-6 w-full">
@@ -49,6 +76,16 @@ export const MealPlansList = ({ onSave }: MealPlansListProps) => {
                         {new Date(plan.createdAt).toLocaleDateString()}
                       </p>
                     </div>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPlanToDelete(plan);
+                      }}
+                      variant="ghost"
+                      aria-label="Delete plan"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                   <p 
                     className="mt-2 text-sm line-clamp-2 cursor-pointer hover:text-primary"
@@ -94,6 +131,37 @@ export const MealPlansList = ({ onSave }: MealPlansListProps) => {
             >
               {selectedPlan?.description || ''}
             </ReactMarkdown>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!planToDelete} onOpenChange={(open) => !open && setPlanToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Meal Plan</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-600">
+            Are you sure you want to delete "{planToDelete?.title}"? This action cannot be undone.
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              onClick={() => setPlanToDelete(null)}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDelete}
+              variant="destructive"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <div className="flex items-center gap-2">
+                  <Spinner className="w-4 h-4" />
+                  Deleting...
+                </div>
+              ) : 'Delete'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
