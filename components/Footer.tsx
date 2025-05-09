@@ -8,7 +8,7 @@ const Footer = () => {
         <p
           className="font-bold"
         >
-          CyberSculpt
+          Cloudy Unicorn
         </p>
       </div>
     </footer>

@@ -9,14 +9,14 @@ const Logo = ({ height = 40 }: { height?: number }) => {
       {/* Light mode logo */}
       <Image
         src={logoBlack}
-        alt="CyberSculpt"
+        alt="Cloudy Unicorn"
         height={height}
         className="block dark:hidden"
       />
       {/* Dark mode logo */}
       <Image
         src={logoWhite}
-        alt="CyberSculpt"
+        alt="Cloudy Unicorn"
         height={height}
         className="hidden dark:block"
       />

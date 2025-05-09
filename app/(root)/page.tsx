@@ -30,7 +30,7 @@ export default async function Home() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-6">
             Achieve Your Health Goals with{' '}
             <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              CyberSculpt
+              Cloudy Unicorn
             </span>
           </h1>
 
@@ -123,7 +123,7 @@ export default async function Home() {
             Ready to Transform Your Life?
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"> {/* Adjusted text & spacing */}
-            Join thousands already achieving their fitness goals with CyberSculpt's personalized approach.
+            Join thousands already achieving their fitness goals with Cloudy Unicorn's personalized approach.
           </p>
           {/* Updated Button to match Hero */}
           <Button size="lg" className="h-12 px-8 rounded-full text-base font-semibold group" asChild>

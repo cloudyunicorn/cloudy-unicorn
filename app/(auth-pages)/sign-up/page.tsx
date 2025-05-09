@@ -53,7 +53,7 @@ export default function SignUpPage() {
           Sign Up
         </CardTitle>
         <CardDescription className="text-center">
-          Join CyberSculpt
+          Join Cloudy Unicorn
         </CardDescription>
 
         {errorMsg && (

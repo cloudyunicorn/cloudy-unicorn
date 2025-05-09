@@ -60,17 +60,18 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.className} antialiased`} suppressHydrationWarning>
       <head>
-        <title>CyberSculpt</title>
-        <meta name="description" content="The fastest way to improve your health." />
+        <title>Cloudy Unicorn</title>
+        <meta name="description" content="Smart Meals & Smarter Workouts with AI" />
         <meta property="og:url" content={defaultUrl} />
         <link rel="canonical" href={defaultUrl} />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#13131a" />
+        <meta name="mobile-web-app-capable" content="yes"></meta>
         
         {/* iOS specific PWA tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="CyberSculpt" />
+        <meta name="apple-mobile-web-app-title" content="Cloudy Unicorn" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152x152.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180x180.png" />
@@ -90,10 +91,10 @@ export default function RootLayout({
               <Dialog open={showInstall} onOpenChange={setShowInstall}>
                 <DialogContent className="fixed m-auto h-fit max-h-[90vh] w-[90vw] max-w-md rounded-lg z-50 overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>Install CyberSculpt</DialogTitle>
+                    <DialogTitle>Install Cloudy Unicorn</DialogTitle>
                   </DialogHeader>
                   <div className="flex flex-col gap-4">
-                    <p>Add CyberSculpt to your home screen for a better experience!</p>
+                    <p>Add Cloudy Unicorn to your home screen for a better experience!</p>
                     <div className="flex justify-end gap-2">
                       <DialogClose asChild>
                         <Button variant="outline">Later</Button>
