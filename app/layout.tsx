@@ -65,8 +65,7 @@ export default function RootLayout({
         <meta property="og:url" content={defaultUrl} />
         <link rel="canonical" href={defaultUrl} />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8f8f8" />
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#080808" />
+        <meta name="theme-color" content="#13131a" />
       </head>
       <SupabaseProvider>
         <body>
