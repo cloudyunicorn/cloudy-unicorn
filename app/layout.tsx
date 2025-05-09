@@ -68,7 +68,6 @@ export default function RootLayout({
         <meta name="theme-color" content="#13131a" />
         <meta name="mobile-web-app-capable" content="yes"></meta>
         
-        {/* iOS specific PWA tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Cloudy Unicorn" />
