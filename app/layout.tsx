@@ -66,6 +66,15 @@ export default function RootLayout({
         <link rel="canonical" href={defaultUrl} />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#13131a" />
+        
+        {/* iOS specific PWA tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="CyberSculpt" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152x152.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180x180.png" />
+        <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#13131a" />
       </head>
       <SupabaseProvider>
         <body>
