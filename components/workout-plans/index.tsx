@@ -19,7 +19,7 @@ import {
 import { saveWorkoutProgram } from '@/lib/actions/user.action';
 import { useData } from '@/contexts/DataContext';
 import { SavedWorkoutsList } from './SavedWorkoutsList';
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
 const WorkoutPlans = () => {
   const [query, setQuery] = useState('');
@@ -55,7 +55,7 @@ const WorkoutPlans = () => {
   });
 
   const { data: userData, refetch } = useData();
-  
+
   // Set context from user data
   if (userData?.profile && !context.bodyMetrics.age) {
     const profile = userData.profile;
@@ -78,7 +78,7 @@ const WorkoutPlans = () => {
       const title = `Workout Plan ${new Date().toLocaleDateString()}`;
       const description = workoutPlan;
       const difficulty = context.fitnessLevel;
-      
+
       const result = await saveWorkoutProgram(title, description, difficulty);
       if (result.error) {
         toast.error('Failed to save workout plan');
@@ -98,9 +98,9 @@ const WorkoutPlans = () => {
     try {
       const prompt = getWorkoutPrompt(context, query);
       const responseStream = getFitnessResponse(prompt, context);
-      
+
       for await (const chunk of responseStream) {
-        setWorkoutPlan(prev => prev + chunk);
+        setWorkoutPlan((prev) => prev + chunk);
       }
     } catch (error) {
       console.error('Error getting workout plan:', error);
@@ -166,13 +166,15 @@ const WorkoutPlans = () => {
             />
           </div>
 
-          <Button
-            onClick={handleGetWorkout}
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading ? 'Generating...' : 'Get Workout Plan'}
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              onClick={handleGetWorkout}
+              disabled={isLoading}
+              className="w-auto"
+            >
+              {isLoading ? 'Generating...' : 'Get Workout Plan'}
+            </Button>
+          </div>
 
           {workoutPlan && (
             <Card className="mt-6 relative">
@@ -181,7 +183,7 @@ const WorkoutPlans = () => {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="flex justify-end mb-4">
-                  <Button 
+                  <Button
                     onClick={handleSaveWorkout}
                     variant="outline"
                     disabled={isSaving}
@@ -219,11 +221,11 @@ const WorkoutPlans = () => {
                         <hr className="my-4 border-gray-200" {...props} />
                       ),
                       a: ({ node, ...props }) => (
-                        <a 
-                          className="text-blue-600 underline hover:text-blue-800" 
+                        <a
+                          className="text-blue-600 underline hover:text-blue-800"
                           target="_blank"
                           rel="noopener noreferrer"
-                          {...props} 
+                          {...props}
                         />
                       ),
                     }}
@@ -236,7 +238,7 @@ const WorkoutPlans = () => {
           )}
         </CardContent>
       </Card>
-      
+
       <SavedWorkoutsList onSave={refetch} />
     </div>
   );

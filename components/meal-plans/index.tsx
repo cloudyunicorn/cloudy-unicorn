@@ -138,13 +138,15 @@ const MealPlans = () => {
             />
           </div>
 
-          <Button
-            onClick={handleGetSuggestions}
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading ? 'Generating...' : 'Get Meal Suggestions'}
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              onClick={handleGetSuggestions}
+              disabled={isLoading}
+              className="w-auto"
+            >
+              {isLoading ? 'Generating...' : 'Get Meal Suggestions'}
+            </Button>
+          </div>
 
           {mealSuggestions && (
             <Card className="mt-6 relative">

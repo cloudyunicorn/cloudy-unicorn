@@ -36,16 +36,17 @@ const Habits = () => {
   });
 
   const { data: userData } = useData();
-  
+
   // Set context from user data
   if (userData?.profile && !context.bodyMetrics.age) {
     const profile = userData.profile;
     setContext({
       ...context,
       fitnessLevel: profile.fitnessLevel?.toLowerCase() || 'moderate',
-      goals: userData.goals?.map((g) =>
-        g.toLowerCase().replace(/_/g, ' ')
-      ) || ['improve sleep', 'reduce stress'],
+      goals: userData.goals?.map((g) => g.toLowerCase().replace(/_/g, ' ')) || [
+        'improve sleep',
+        'reduce stress',
+      ],
       bodyMetrics: {
         age: profile.age ?? undefined,
         weight: profile.weight ?? undefined,
@@ -60,9 +61,9 @@ const Habits = () => {
     try {
       const prompt = getHabitPrompt(context, query);
       const responseStream = getFitnessResponse(prompt, context);
-      
+
       for await (const chunk of responseStream) {
-        setHabitSuggestions(prev => prev + chunk);
+        setHabitSuggestions((prev) => prev + chunk);
       }
     } catch (error) {
       console.error('Error getting habit suggestions:', error);
@@ -106,13 +107,15 @@ const Habits = () => {
             />
           </div>
 
-          <Button
-            onClick={handleGetHabits}
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading ? 'Generating...' : 'Get Habit Suggestions'}
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              onClick={handleGetHabits}
+              disabled={isLoading}
+              className="w-auto"
+            >
+              {isLoading ? 'Generating...' : 'Get Habit Suggestions'}
+            </Button>
+          </div>
 
           {habitSuggestions && (
             <Card className="mt-6">
