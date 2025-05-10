@@ -35,6 +35,7 @@ import WorkoutPlans from "../workout-plans";
 import Habits from "../habits";
 import HealthAssessments from "../health-assessments.tsx";
 import ProgressTrack from "../progress-track";
+import { ExerciseTrack } from "../exercise-track"
 import { UserSettings } from "../settings";
 import Link from "next/link";
 
@@ -81,6 +82,11 @@ export const data = {
     {
       title: 'Progress Tracking',
       component: ProgressTrack,
+      icon: DatabaseIcon,
+    },
+    {
+      title: 'Exercise Tracking',
+      component: ExerciseTrack,
       icon: DatabaseIcon,
     },
   ],

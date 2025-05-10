@@ -112,6 +112,9 @@ model Exercise {
   equipment    String[]
   muscleGroup  String[]
   difficulty   DifficultyLevel
+  weight       Float?     // Tracked weight for the exercise
+  reps         Int?       // Tracked repetitions
+  sets         Int?       // Number of sets
   createdAt    DateTime   @default(now()) @map("created_at")
   
   workoutPrograms WorkoutProgram[]
