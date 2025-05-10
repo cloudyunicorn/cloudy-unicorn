@@ -2,10 +2,14 @@
 
 import React from 'react';
 import {
+  Activity,
   BarChartIcon,
+  BicepsFlexed,
   Calendar,
+  ChartNoAxesCombined,
   ClipboardListIcon,
   DatabaseIcon,
+  Dumbbell,
   FileIcon,
   HeartHandshake,
   HelpCircleIcon,
@@ -13,6 +17,7 @@ import {
   MessageCircle,
   SettingsIcon,
   SwatchBook,
+  UtensilsCrossed,
 } from 'lucide-react';
 import { FeedbackForm } from '@/components/feedback/FeedbackForm';
 
@@ -60,14 +65,19 @@ export const data = {
       icon: LayoutDashboardIcon,
     },
     {
-      title: 'Meal Plans',
-      component: MealPlans,
-      icon: Calendar,
-    },
-    {
       title: 'Workout Programs',
       component: WorkoutPlans,
-      icon: BarChartIcon,
+      icon: Dumbbell,
+    },
+    {
+      title: 'Meal Plans',
+      component: MealPlans,
+      icon: UtensilsCrossed,
+    },
+    {
+      title: 'Health Assessments',
+      component: HealthAssessments,
+      icon: Activity,
     },
     {
       title: 'Habits',
@@ -75,19 +85,14 @@ export const data = {
       icon: HeartHandshake,
     },
     {
-      title: 'Health Assessments',
-      component: HealthAssessments,
-      icon: SwatchBook,
-    },
-    {
       title: 'Progress Tracking',
       component: ProgressTrack,
-      icon: DatabaseIcon,
+      icon: ChartNoAxesCombined,
     },
     {
       title: 'Exercise Tracking',
       component: ExerciseTrack,
-      icon: DatabaseIcon,
+      icon: BicepsFlexed,
     },
   ],
   navSecondary: [
