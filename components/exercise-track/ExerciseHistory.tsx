@@ -1,45 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getExerciseHistory } from '@/lib/actions/exercise.action';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-interface ExerciseLog {
-  exerciseId: string;
-  name: string;
-  reps: number;
-  weight: number;
-  sets: number;
-  notes?: string;
-  date: Date;
-  sessionId: string;
-}
+import { useExercise, type ExerciseLog } from '@/contexts/ExerciseContext';
 
 export function ExerciseHistory() {
-  const [logs, setLogs] = useState<ExerciseLog[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const result = await getExerciseHistory();
-        if (result?.logs) {
-          setLogs(result.logs.map(log => ({
-            ...log,
-            date: new Date(log.date)
-          })));
-        }
-      } catch (error) {
-        console.error('Failed to fetch exercise history', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchHistory();
-  }, []);
+  const { exerciseHistory: logs, isLoading } = useExercise();
 
   if (isLoading) {
     return <div className="text-center py-4">Loading history...</div>;
@@ -50,7 +17,7 @@ export function ExerciseHistory() {
   }
 
   // Group logs by date
-  const groupedLogs = logs.reduce((acc, log) => {
+  const groupedLogs = logs.reduce<Record<string, ExerciseLog[]>>((acc, log) => {
     const dateKey = format(log.date, 'yyyy-MM-dd');
     if (!acc[dateKey]) {
       acc[dateKey] = [];

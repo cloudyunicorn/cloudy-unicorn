@@ -3,10 +3,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExerciseLogForm } from './ExerciseLogForm';
 import { ExerciseHistory } from './ExerciseHistory';
+import { ExerciseProvider } from '@/contexts/ExerciseContext';
 
 export function ExerciseTrack() {
   return (
-    <div className="space-y-4">
+    <ExerciseProvider>
+      <div className="space-y-4 p-4">
       <Tabs defaultValue="log" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="log">Log Exercise</TabsTrigger>
@@ -23,6 +25,7 @@ export function ExerciseTrack() {
           <ExerciseHistory />
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </ExerciseProvider>
   );
 }
