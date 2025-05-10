@@ -6,6 +6,7 @@ import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { FitnessGoal, DifficultyLevel, Gender, ActivityLevel } from '@prisma/client';
 import { revalidatePath } from "next/cache";
+import { getExerciseHistory } from "./exercise.action";
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -63,9 +64,28 @@ export async function getUserProfileAndGoals() {
     }
     const authId = user.id;
 
-    // Calculate date 7 days ago for workout count
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    // Calculate current week's Monday and Sunday for workout count
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    // Get exercise history to count workouts
+    const exerciseResult = await getExerciseHistory();
+    const exerciseLogs = exerciseResult?.logs || [];
+    const workoutDates = new Set(
+      exerciseLogs
+        .filter((log: { date: Date }) => {
+          const logDate = new Date(log.date);
+          return logDate >= monday && logDate <= sunday;
+        })
+        .map((log: { date: Date }) => new Date(log.date).toISOString().split('T')[0]) // Get just YYYY-MM-DD
+    );
+    const workoutsThisWeek = workoutDates.size;
 
     // Fetch user data including profile, goals, and related stats
     const userData = await prisma.user.findUnique({
@@ -88,12 +108,6 @@ export async function getUserProfileAndGoals() {
         },
         _count: {
           select: {
-            workoutSessions: {
-              where: {
-                completed: true,
-                date: { gte: sevenDaysAgo }
-              }
-            },
             challenges: {
               where: { completed: false }
             }
@@ -156,7 +170,7 @@ export async function getUserProfileAndGoals() {
       goals: userData.goals,
       profile: userData.profile,
       stats: {
-        workoutsThisWeek: userData._count.workoutSessions,
+        workoutsThisWeek,
         activeChallenges: userData._count.challenges,
         latestWeightLog: userData.progressLogs.find(log => log.type === 'WEIGHT') || null,
         metrics: userData.progressLogs.map(log => ({
