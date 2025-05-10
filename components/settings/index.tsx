@@ -8,10 +8,6 @@ import { Suspense, useEffect, useState } from 'react'
 import { getUserInfo } from '@/lib/actions/user.action'
 import { UserMetadata } from "@supabase/supabase-js"
 
-interface User {
-  email?: string;
-}
-
 export function UserSettings() {
   const [userData, setUserData] = useState<UserMetadata | null>(null);
   const [loading, setLoading] = useState(true)

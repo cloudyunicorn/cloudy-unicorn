@@ -50,6 +50,7 @@ model User {
   bodyMeasurements BodyMeasurement[]
   healthAssessments AIHealthAssessment[]
   workoutSessions WorkoutSession[]
+  feedbacks       Feedback[]
   goals           FitnessGoal[]     @default([])
 
   @@index([email, createdAt])
@@ -227,4 +228,24 @@ model AIHealthAssessment {
   createdAt    DateTime   @default(now()) @map("created_at")
 
   @@index([userId, assessmentDate])
+}
+
+enum FeedbackStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Feedback {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  content      String
+  status       FeedbackStatus @default(OPEN)
+  metadata     Json?      // Browser/device info
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  @@index([userId, status, createdAt])
 }

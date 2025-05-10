@@ -10,10 +10,11 @@ import {
   HeartHandshake,
   HelpCircleIcon,
   LayoutDashboardIcon,
-  SearchIcon,
+  MessageCircle,
   SettingsIcon,
   SwatchBook,
 } from 'lucide-react';
+import { FeedbackForm } from '@/components/feedback/FeedbackForm';
 
 import {
   Sidebar,
@@ -95,9 +96,9 @@ export const data = {
       icon: HelpCircleIcon,
     },
     {
-      title: 'Search',
-      url: '/',
-      icon: SearchIcon,
+      title: 'Feedback',
+      component: FeedbackForm,
+      icon: MessageCircle,
     },
   ],
   documents: [
