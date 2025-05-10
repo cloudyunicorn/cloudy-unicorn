@@ -105,7 +105,7 @@ export const MealPlansList = ({ onSave }: MealPlansListProps) => {
       </Card>
 
       <Dialog open={!!selectedPlan} onOpenChange={(open) => !open && setSelectedPlan(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="md:max-w-2xl w-5/6 max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedPlan?.title}</DialogTitle>
           </DialogHeader>

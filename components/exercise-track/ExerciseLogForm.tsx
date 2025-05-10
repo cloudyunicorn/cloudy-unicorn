@@ -6,9 +6,11 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { logExercise } from '@/lib/actions/exercise.action';
 import { useState } from 'react';
+import { useExercise } from '@/contexts/ExerciseContext';
 
 export function ExerciseLogForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { addExercise } = useExercise();
   const [formData, setFormData] = useState({
     exerciseName: '',
     reps: '',
@@ -44,6 +46,15 @@ export function ExerciseLogForm() {
         toast.error(result.error);
       } else {
         toast.success('Exercise logged successfully!');
+        // Add exercise to context
+        addExercise({
+          name: formData.exerciseName,
+          reps: Number(formData.reps),
+          weight: Number(formData.weight),
+          sets: Number(formData.sets),
+          notes: formData.notes || '',
+          date: new Date(formData.date)
+        });
         // Reset form
         setFormData({
           exerciseName: '',

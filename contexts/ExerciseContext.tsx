@@ -19,6 +19,7 @@ interface ExerciseContextProps {
   isLoading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
+  addExercise: (exercise: Omit<ExerciseLog, 'exerciseId' | 'sessionId'>) => void;
 }
 
 const ExerciseContext = createContext<ExerciseContextProps | undefined>(undefined);
@@ -55,11 +56,23 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
     fetchExerciseHistory();
   }, []);
 
+  const addExercise = (exercise: Omit<ExerciseLog, 'exerciseId' | 'sessionId'>) => {
+    setExerciseHistory(prev => [
+      {
+        ...exercise,
+        exerciseId: Date.now().toString(), // Temporary ID
+        sessionId: Date.now().toString(), // Temporary ID
+      },
+      ...prev
+    ]);
+  };
+
   const value = {
     exerciseHistory,
     isLoading,
     error,
     refetch: fetchExerciseHistory,
+    addExercise,
   };
 
   return (

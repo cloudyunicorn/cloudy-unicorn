@@ -104,7 +104,7 @@ export const SavedWorkoutsList = ({ onSave }: SavedWorkoutsListProps) => {
       </Card>
 
       <Dialog open={!!selectedProgram} onOpenChange={(open) => !open && setSelectedProgram(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="md:max-w-2xl w-5/6 max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedProgram?.title}</DialogTitle>
           </DialogHeader>
