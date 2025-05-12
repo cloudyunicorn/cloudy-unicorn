@@ -1,6 +1,6 @@
 {
   "name": "Cloudy Unicorn",
-  "short_name": "Cloudy Unicorn",
+  "short_name": "CloudyUnicorn",
   "description": "Fitness and health tracking PWA",
   "start_url": "/",
   "display": "standalone",

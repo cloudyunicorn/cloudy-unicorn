@@ -14,6 +14,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from '@/components/ui/dialog';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Button } from '@/components/ui/button';
 
 const defaultUrl = process.env.VERCEL_URL
@@ -84,7 +85,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <main>{children}</main>
+            <main>
+              {children}
+              <SpeedInsights />
+            </main>
             <Toaster position="top-center" richColors />
             {showInstall && (
               <Dialog open={showInstall} onOpenChange={setShowInstall}>
