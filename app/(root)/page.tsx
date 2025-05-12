@@ -28,11 +28,11 @@ export default async function Home() {
 
           {/* Enhanced Typography and Spacing */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-6">
-            Achieve Your Health Goals with{' '}
-            <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              Cloudy Unicorn
-            </span>
+            AI-Powered Fitness & Nutrition Platform | Cloudy Unicorn
           </h1>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-4 text-muted-foreground">
+            Achieve Your Health Goals with Personalized Plans
+          </h2>
 
           <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
             Your all-in-one platform for personalized meal plans, custom workouts,
@@ -68,25 +68,25 @@ export default async function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"> {/* Adjusted lg breakpoint */}
             {[
               {
-                icon: <Apple className="h-10 w-10" />,
+                icon: <Apple className="h-10 w-10" aria-label="Nutrition icon" />,
                 title: 'Personalized Meal Plans',
                 description:
                   'Tailored nutrition guides based on your goals and preferences.',
               },
               {
-                icon: <Dumbbell className="h-10 w-10" />,
+                icon: <Dumbbell className="h-10 w-10" aria-label="Workout icon" />,
                 title: 'Custom Workout Programs',
                 description:
                   'Exercise routines designed for your fitness level and schedule.',
               },
               {
-                icon: <ClipboardCheck className="h-10 w-10" />,
+                icon: <ClipboardCheck className="h-10 w-10" aria-label="Habits icon" />,
                 title: 'Habit‑Changing Challenges',
                 description:
                   'Daily and weekly challenges to build lasting healthy habits.',
               },
               {
-                icon: <BarChart className="h-10 w-10" />,
+                icon: <BarChart className="h-10 w-10" aria-label="Progress icon" />,
                 title: 'Progress Tracking',
                 description:
                   'Monitor workouts, meals, and habits with intuitive charts.',
@@ -133,6 +133,50 @@ export default async function Home() {
           </Button>
         </div>
       </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "Service",
+                "name": "Personalized Meal Plans",
+                "description": "Tailored nutrition guides based on your goals and preferences."
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "Service",
+                "name": "Custom Workout Programs",
+                "description": "Exercise routines designed for your fitness level and schedule."
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "Service",
+                "name": "Habit-Changing Challenges",
+                "description": "Daily and weekly challenges to build lasting healthy habits."
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "Service",
+                "name": "Progress Tracking",
+                "description": "Monitor workouts, meals, and habits with intuitive charts."
+              }
+            }
+          ]
+        })
+      }} />
     </main>
   );
 }
