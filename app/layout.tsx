@@ -15,6 +15,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 import { Button } from '@/components/ui/button';
 
 const defaultUrl = process.env.VERCEL_URL
@@ -88,6 +89,7 @@ export default function RootLayout({
             <main>
               {children}
               <SpeedInsights />
+              <Analytics />
             </main>
             <Toaster position="top-center" richColors />
             {showInstall && (
