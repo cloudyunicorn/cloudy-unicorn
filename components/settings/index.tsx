@@ -16,9 +16,15 @@ export function UserSettings() {
     const fetchUser = async () => {
       try {
         const fetchedData = await getUserInfo();
-        setUserData(fetchedData.user_metadata)
+        if (fetchedData?.user_metadata) {
+          setUserData(fetchedData.user_metadata)
+        } else {
+          console.warn('User metadata not found in response')
+          setUserData(null)
+        }
       } catch (error) {
         console.error('Failed to fetch user:', error)
+        setUserData(null)
       } finally {
         setLoading(false)
       }
