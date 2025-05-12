@@ -2,6 +2,7 @@
 
 import { Geist } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
+import { UserProvider } from '@/contexts/UserContext';
 import './globals.css';
 import { SupabaseProvider } from '@/providers/supabase-provider';
 import { Toaster } from 'sonner';
@@ -80,7 +81,8 @@ export default function RootLayout({
       </head>
       <SupabaseProvider>
         <body>
-          <ThemeProvider
+          <UserProvider>
+            <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
@@ -110,7 +112,8 @@ export default function RootLayout({
                 </DialogContent>
               </Dialog>
             )}
-          </ThemeProvider>
+            </ThemeProvider>
+          </UserProvider>
         </body>
       </SupabaseProvider>
     </html>
