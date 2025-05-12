@@ -46,7 +46,7 @@ export async function getUserInfo() {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) {
-    throw new Error("User not found");
+    return null;
   }
   return data.user;
 }

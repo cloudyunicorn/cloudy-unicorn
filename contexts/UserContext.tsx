@@ -27,7 +27,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     setError(null);
     try {
       const data = await getUserInfo();
-      setUser(data.user_metadata);
+      setUser(data?.user_metadata || null);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch user data'));
       console.error("Error fetching user data:", err);
