@@ -28,7 +28,7 @@ export default async function Home() {
 
           {/* Enhanced Typography and Spacing */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-6">
-            AI-Powered Fitness & Nutrition Platform | Cloudy Unicorn
+            AI-Powered Fitness & Nutrition Platform | <p className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">Cloudy Unicorn</p>
           </h1>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-4 text-muted-foreground">
             Achieve Your Health Goals with Personalized Plans
