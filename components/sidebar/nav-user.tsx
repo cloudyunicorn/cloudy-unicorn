@@ -31,6 +31,7 @@ import {
 } from '@/lib/actions/user.action';
 import { useEffect, useState } from 'react';
 import { UserMetadata } from "@supabase/supabase-js";
+import { Spinner } from '@/components/ui/spinner';
 
 function getInitials(name?: string) {
   if (!name) return 'US';
@@ -51,6 +52,17 @@ export function NavUser() {
     }
     fetchUserData();
   }, []);
+
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await signOutAction();
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -110,9 +122,19 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={signOutAction}>
+            <DropdownMenuItem 
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+            >
               <LogOutIcon />
-              Sign Out
+              {isSigningOut ? (
+                <div className="flex items-center gap-2">
+                  <Spinner size="sm" />
+                  Signing Out...
+                </div>
+              ) : (
+                'Sign Out'
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
