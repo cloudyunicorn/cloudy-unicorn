@@ -35,25 +35,25 @@ export function ExerciseHistory() {
           <CardHeader>
             <CardTitle>{format(new Date(date), 'MMMM d, yyyy')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="w-fit md:w-full">
-              <Table className="w-full">
+          <CardContent className="p-0">
+            <div className="w-full">
+              <Table className="w-full overflow-x-hidden">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Exercise</TableHead>
-                    <TableHead>Sets</TableHead>
-                    <TableHead>Reps</TableHead>
-                    <TableHead>Weight (kg)</TableHead>
+                    <TableHead className="pr-0">Exercise</TableHead>
+                    <TableHead className="p-0">Sets |</TableHead>
+                    <TableHead className="p-0">Reps |</TableHead>
+                    <TableHead className="p-0">Weight (kg)</TableHead>
                     <TableHead>Notes</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {dateLogs.map((log, index) => (
                     <TableRow key={`${date}-${index}`}>
-                      <TableCell className="font-medium">{log.name}</TableCell>
-                      <TableCell>{log.sets}</TableCell>
-                      <TableCell>{log.reps}</TableCell>
-                      <TableCell>{log.weight}</TableCell>
+                      <TableCell className="font-medium pr-0">{log.name}</TableCell>
+                      <TableCell className="p-0">{log.sets}</TableCell>
+                      <TableCell className="p-0">{log.reps}</TableCell>
+                      <TableCell className="p-0">{log.weight}</TableCell>
                       <TableCell className="text-muted-foreground">
                         <Dialog>
                           <DialogTitle></DialogTitle>
