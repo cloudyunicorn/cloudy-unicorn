@@ -7,21 +7,8 @@ import './globals.css';
 import { SupabaseProvider } from '@/providers/supabase-provider';
 import { Toaster, toast } from 'sonner';
 import { useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from '@/components/ui/dialog';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
-import { Button } from '@/components/ui/button';
-
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : 'http://localhost:3000';
 
 const geistSans = Geist({
   display: 'swap',
@@ -40,7 +27,11 @@ export default function RootLayout({
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e);
-      setShowInstall(true);
+      // Only show if not already shown this session
+      if (!sessionStorage.getItem('pwaPromptShown')) {
+        setShowInstall(true);
+        sessionStorage.setItem('pwaPromptShown', 'true');
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -57,6 +48,8 @@ export default function RootLayout({
     const { outcome } = await promptEvent.userChoice;
     if (outcome === 'accepted') {
       setShowInstall(false);
+      // Clear the flag if installed
+      sessionStorage.removeItem('pwaPromptShown');
     }
   };
 
