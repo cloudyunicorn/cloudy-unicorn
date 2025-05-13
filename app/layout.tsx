@@ -27,11 +27,6 @@ export default function RootLayout({
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e);
-      // Only show if not already shown this session
-      if (!sessionStorage.getItem('pwaPromptShown')) {
-        setShowInstall(true);
-        sessionStorage.setItem('pwaPromptShown', 'true');
-      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -40,6 +35,13 @@ export default function RootLayout({
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
+
+  useEffect(() => {
+    if (installPrompt && !sessionStorage.getItem('pwaPromptShown')) {
+      setShowInstall(true);
+      sessionStorage.setItem('pwaPromptShown', 'true');
+    }
+  }, [installPrompt]);
 
   const handleInstallClick = async () => {
     if (!installPrompt) return;
