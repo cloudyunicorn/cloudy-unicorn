@@ -5,7 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import { UserProvider } from '@/contexts/UserContext';
 import './globals.css';
 import { SupabaseProvider } from '@/providers/supabase-provider';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import {
   Dialog,
@@ -135,22 +135,14 @@ export default function RootLayout({
             </main>
             <Toaster position="top-center" richColors />
             {showInstall && (
-              <Dialog open={showInstall} onOpenChange={setShowInstall}>
-                <DialogContent className="fixed m-auto h-fit max-h-[90vh] w-[90vw] max-w-md rounded-lg z-50 overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Install Cloudy Unicorn</DialogTitle>
-                  </DialogHeader>
-                  <div className="flex flex-col gap-4">
-                    <p>Add Cloudy Unicorn to your home screen for a better experience!</p>
-                    <div className="flex justify-end gap-2">
-                      <DialogClose asChild>
-                        <Button variant="outline">Later</Button>
-                      </DialogClose>
-                      <Button onClick={handleInstallClick}>Install</Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              toast('Add to home screen for better experience', {
+                duration: 10000,
+                action: {
+                  label: 'Install',
+                  onClick: handleInstallClick
+                },
+                className: 'cursor-pointer'
+              })
             )}
             </ThemeProvider>
           </UserProvider>
