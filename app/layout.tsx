@@ -133,7 +133,7 @@ export default function RootLayout({
               <SpeedInsights />
               <Analytics />
             </main>
-            <Toaster position="top-center" richColors />
+            <Toaster position="top-center" expand={false} visibleToasts={1} richColors />
             {showInstall && (
               toast('Add to home screen for better experience', {
                 duration: 10000,
