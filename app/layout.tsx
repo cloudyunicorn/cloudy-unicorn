@@ -27,33 +27,35 @@ export default function RootLayout({
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e);
+      // Show install toast next render
+      setShowInstall(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
   }, []);
 
   useEffect(() => {
-    if (installPrompt && !sessionStorage.getItem('pwaPromptShown')) {
-      setShowInstall(true);
+    if (showInstall && installPrompt && !sessionStorage.getItem('pwaPromptShown')) {
+      toast('Add to home screen for better experience', {
+        duration: 10000,
+        action: {
+          label: 'Install',
+          onClick: async () => {
+            const promptEvent = installPrompt as any;
+            promptEvent.prompt();
+            const { outcome } = await promptEvent.userChoice;
+            if (outcome === 'accepted') {
+              sessionStorage.removeItem('pwaPromptShown');
+              setShowInstall(false);
+            }
+          },
+        },
+        className: 'cursor-pointer',
+      });
       sessionStorage.setItem('pwaPromptShown', 'true');
     }
-  }, [installPrompt]);
-
-  const handleInstallClick = async () => {
-    if (!installPrompt) return;
-    const promptEvent = installPrompt as any;
-    promptEvent.prompt();
-    const { outcome } = await promptEvent.userChoice;
-    if (outcome === 'accepted') {
-      setShowInstall(false);
-      // Clear the flag if installed
-      sessionStorage.removeItem('pwaPromptShown');
-    }
-  };
+  }, [showInstall, installPrompt]);
 
   return (
     <html lang="en" className={`${geistSans.className} antialiased`} suppressHydrationWarning>
@@ -129,16 +131,6 @@ export default function RootLayout({
               <Analytics />
             </main>
             <Toaster position="top-center" expand={false} visibleToasts={1} richColors />
-            {showInstall && (
-              toast('Add to home screen for better experience', {
-                duration: 10000,
-                action: {
-                  label: 'Install',
-                  onClick: handleInstallClick
-                },
-                className: 'cursor-pointer'
-              })
-            )}
             </ThemeProvider>
           </UserProvider>
         </body>
