@@ -133,6 +133,24 @@ export default async function Home() {
             </Link>
           </Button>
           <Subscription />
+
+          {/* Legal Links */}
+          <div className="mt-12 pt-8 border-t border-border/50">
+            <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 text-sm text-muted-foreground">
+              <Link href="/terms" className="hover:text-foreground transition-colors">
+                Terms & Conditions
+              </Link>
+              <Link href="/privacy" className="hover:text-foreground transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/refund" className="hover:text-foreground transition-colors">
+                Refund Policy
+              </Link>
+              <Link href="/contact" className="hover:text-foreground transition-colors">
+                Contact Us
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{
