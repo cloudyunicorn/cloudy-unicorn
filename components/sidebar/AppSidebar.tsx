@@ -3,20 +3,17 @@
 import React from 'react';
 import {
   Activity,
-  BarChartIcon,
   BicepsFlexed,
-  Calendar,
   ChartNoAxesCombined,
   ClipboardListIcon,
+  CreditCard,
   DatabaseIcon,
   Dumbbell,
   FileIcon,
   HeartHandshake,
-  HelpCircleIcon,
   LayoutDashboardIcon,
   MessageCircle,
   SettingsIcon,
-  SwatchBook,
   UtensilsCrossed,
 } from 'lucide-react';
 import { FeedbackForm } from '@/components/feedback/FeedbackForm';
@@ -44,6 +41,7 @@ import ProgressTrack from "../progress-track";
 import { ExerciseTrack } from "../exercise-track"
 import { UserSettings } from "../settings";
 import Link from "next/link";
+import Subscription from "../Subscription";
 
 export interface NavItem {
   title: string;
@@ -103,9 +101,9 @@ export const data = {
       icon: SettingsIcon,
     },
     {
-      title: 'Get Help',
-      url: '/',
-      icon: HelpCircleIcon,
+      title: 'Subscriptions',
+      component: Subscription,
+      icon: CreditCard,
     },
     {
       title: 'Feedback',

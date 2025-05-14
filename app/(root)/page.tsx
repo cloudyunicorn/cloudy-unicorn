@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 import { ArrowRight } from 'lucide-react'; // Added ArrowRight
+import Subscription from "@/components/Subscription";
 
 export default async function Home() {
   return (
@@ -131,6 +132,7 @@ export default async function Home() {
               Start Your Free Trial <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" /> {/* Added Arrow */}
             </Link>
           </Button>
+          <Subscription />
         </div>
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{

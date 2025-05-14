@@ -49,7 +49,6 @@ const Menu = () => {
       <nav className="hidden md:flex w-full max-w-xs gap-1">
         {!session && (
           <>
-            {/* Removed isLoading state and onClick handler */}
             <Button asChild variant="ghost">
               <Link href="/sign-in">
                 Sign In
