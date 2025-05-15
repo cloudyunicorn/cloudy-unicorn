@@ -35,7 +35,18 @@ const HealthAssessments = () => {
     );
   }
 
-  const { weight, height, age, gender, activityLevel } = userData.profile;
+  const { weight, height, age, gender, activityLevel, targetWeight } = userData.profile;
+  
+  // Determine weight goal based on current vs target weight
+  let weightGoal: 'LOSE' | 'MAINTAIN' | 'GAIN' = 'MAINTAIN';
+  if (targetWeight && weight) {
+    const weightDifference = targetWeight - weight;
+    if (weightDifference < -2) {
+      weightGoal = 'LOSE';
+    } else if (weightDifference > 2) {
+      weightGoal = 'GAIN';
+    }
+  }
   
   const bmi = calculateBMI(weight!, height!);
   // Convert Prisma enums to calculation-friendly formats
@@ -48,7 +59,7 @@ const HealthAssessments = () => {
     activityLevel: activityLevel!,
   });
   const [minWeight, maxWeight] = getHealthyWeightRange(height!);
-  const suggestedCalories = getSuggestedCalories(bmr, activityLevel!);
+  const suggestedCalories = getSuggestedCalories(bmr, activityLevel!, weightGoal);
 
   return (
     <div className="space-y-4 p-4">
@@ -78,7 +89,13 @@ const HealthAssessments = () => {
 
       <div className="rounded-lg border p-4">
         <h3 className="font-semibold text-lg mb-2">Suggested Daily Calories</h3>
-        <p className="text-muted-foreground">Based on your activity level</p>
+        <p className="text-muted-foreground">
+          Based on your activity level and {{
+            LOSE: `weight loss (target: ${targetWeight}kg)`,
+            MAINTAIN: 'weight maintenance',
+            GAIN: `muscle gain (target: ${targetWeight}kg)`
+          }[weightGoal]}
+        </p>
         <p className="text-2xl font-bold">
           {suggestedCalories.toFixed(0)} kcal/day
         </p>

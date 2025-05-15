@@ -55,8 +55,21 @@ const getActivityMultiplier = (level: ActivityLevel): number => {
   }
 };
 
-export const getSuggestedCalories = (bmr: number, activityLevel: ActivityLevel = 'SEDENTARY'): number => {
-  return Math.round(bmr * getActivityMultiplier(activityLevel));
+export const getSuggestedCalories = (
+  bmr: number, 
+  activityLevel: ActivityLevel = 'SEDENTARY',
+  weightGoal: 'LOSE' | 'MAINTAIN' | 'GAIN' = 'MAINTAIN'
+): number => {
+  const baseCalories = Math.round(bmr * getActivityMultiplier(activityLevel));
+  
+  switch(weightGoal) {
+    case 'LOSE':
+      return baseCalories - 500;
+    case 'GAIN':
+      return baseCalories + 500;
+    default: // MAINTAIN
+      return baseCalories;
+  }
 };
 
 /**
@@ -70,12 +83,40 @@ export const getBMICategory = (bmi: number): string => {
 };
 
 /**
- * Calculate healthy weight range based on BMI standards
- * Returns [minWeight, maxWeight] in kg
+ * Calculate precise healthy weight range based on WHO BMI standards
+ * Uses BMI range of 18.5-24.9 for adults
+ * Returns [minWeight, maxWeight] in kg with 1 decimal precision
+ * 
+ * @param height - Height in centimeters
+ * @returns Tuple of [minHealthyWeight, maxHealthyWeight] in kilograms
  */
 export const getHealthyWeightRange = (height: number): [number, number] => {
   const heightM = height / 100;
-  const lower = Math.round(18.5 * heightM * heightM * 10) / 10;
-  const upper = Math.round(24.9 * heightM * heightM * 10) / 10;
-  return [lower, upper];
+  const lower = 18.5 * heightM * heightM;
+  const upper = 24.9 * heightM * heightM;
+  return [
+    Math.round(lower * 10) / 10, // Round to 1 decimal
+    Math.round(upper * 10) / 10
+  ];
+};
+
+/**
+ * Calculate ideal body weight using Devine formula
+ * Original formula:
+ * - Men: 50 kg + 2.3 kg per inch over 5 feet
+ * - Women: 45.5 kg + 2.3 kg per inch over 5 feet
+ * 
+ * @param height - Height in centimeters
+ * @param gender - 'male' or 'female'
+ * @returns Ideal weight in kilograms with 1 decimal precision
+ */
+export const getIdealBodyWeight = (height: number, gender: 'male' | 'female'): number => {
+  const heightInches = height / 2.54; // Convert cm to inches
+  let baseWeight = gender === 'male' ? 50 : 45.5;
+  
+  if (heightInches > 60) {
+    baseWeight += 2.3 * (heightInches - 60);
+  }
+  
+  return Math.round(baseWeight * 10) / 10;
 };

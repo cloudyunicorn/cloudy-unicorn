@@ -55,6 +55,14 @@ export default async function Home() {
             >
               <Link href="/sign-in">Sign In</Link>
             </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              className="h-12 px-8 rounded-full text-base font-semibold"
+              asChild
+            >
+              <Link href="/body-assessment">Free Body Assessment</Link>
+            </Button>
           </div>
         </div>
       </div>
