@@ -9,6 +9,7 @@ interface UserContextProps {
   isLoading: boolean;
   error: Error | null;
   signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -50,11 +51,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     fetchUser();
   }, []);
 
+  const refreshUser = async () => {
+    await fetchUser();
+  };
+
   const value = {
     user,
     isLoading,
     error,
     signOut: handleSignOut,
+    refreshUser,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

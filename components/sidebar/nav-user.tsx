@@ -25,7 +25,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useUser } from '@/contexts/UserContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 
 function getInitials(name?: string) {
@@ -37,7 +37,13 @@ function getInitials(name?: string) {
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user, isLoading, signOut } = useUser();
+  const { user, isLoading, signOut, refreshUser } = useUser();
+  
+  useEffect(() => {
+    if (!user && !isLoading) {
+      refreshUser();
+    }
+  }, [user, isLoading, refreshUser]);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {
@@ -58,16 +64,25 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                {/* <AvatarImage src={user?.avatar} alt={user?.name} /> */}
-                <AvatarFallback className="rounded-lg">{getInitials(user?.name)}</AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user?.name}</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {user?.email}
-                </span>
-              </div>
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <Spinner size="sm" />
+                  Loading...
+                </div>
+              ) : (
+                <>
+                  <Avatar className="h-8 w-8 rounded-lg grayscale">
+                    {/* <AvatarImage src={user?.avatar} alt={user?.name} /> */}
+                    <AvatarFallback className="rounded-lg">{getInitials(user?.name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{user?.name}</span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {user?.email}
+                    </span>
+                  </div>
+                </>
+              )}
               <MoreVerticalIcon className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
