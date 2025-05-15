@@ -90,3 +90,38 @@ Respond with:
 3. Progress tracking methods
 4. Expected benefits and timeline for each habit`;
 };
+
+export const getBodyAssessmentPrompt = (context: FitnessContext, query: string): string => {
+  const { bodyMetrics } = context;
+  let bodyInfo = '';
+  
+  if (bodyMetrics) {
+    bodyInfo = `Body Metrics:
+    - Age: ${bodyMetrics.age || 'not specified'}
+    - Gender: ${bodyMetrics.gender || 'not specified'}
+    - Weight: ${bodyMetrics.weight ? `${bodyMetrics.weight} kg` : 'not specified'}
+    - Height: ${bodyMetrics.height ? `${bodyMetrics.height} cm` : 'not specified'}
+    - Body Fat: ${bodyMetrics.bodyFatPercentage ? `${bodyMetrics.bodyFatPercentage}%` : 'not specified'}
+    - Target Weight: ${bodyMetrics.targetWeight ? `${bodyMetrics.targetWeight} kg` : 'not specified'}\n`;
+  }
+
+  return `As a certified fitness professional, provide a body assessment based on:
+${bodyInfo}
+Health Conditions: ${context.healthConditions.join(', ') || 'none'}
+Fitness Goals: ${context.goals.join(', ') || 'not specified'}
+
+Analyze these metrics to create an assessment including:
+1. Body composition analysis
+2. Basic health risk evaluation
+3. Personalized recommendations
+
+User query: ${query}
+
+Respond with:
+1. Summary of current body status
+2. Key areas for improvement
+3. Actionable steps tailored to the user
+4. Warning signs to watch for
+
+- Ask the user if they Would you like a sample meal plan or workout routine? Sign Up our platform(don't give any links) - AI fitness platform - get started for free`;
+};
