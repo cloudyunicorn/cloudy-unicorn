@@ -71,7 +71,7 @@ export default function RootLayout({
         <meta property="og:url" content="https://www.cloudyunicorn.com" />
         <meta property="og:title" content="Cloudy Unicorn | AI-Powered Fitness & Nutrition Platform" />
         <meta property="og:description" content="Personalized workout plans and meal recommendations powered by AI. Track your fitness journey and achieve your health goals." />
-        <meta property="og:image" content="https://www.cloudyunicorn.com/assets/Logo/cover.png" />
+        <meta property="og:image" content="https://www.cloudyunicorn.com/assets/cover.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:site_name" content="Cloudy Unicorn" />
@@ -81,7 +81,7 @@ export default function RootLayout({
         <meta name="twitter:url" content="https://www.cloudyunicorn.com" />
         <meta name="twitter:title" content="Cloudy Unicorn | AI-Powered Fitness & Nutrition Platform" />
         <meta name="twitter:description" content="Personalized workout plans and meal recommendations powered by AI. Track your fitness journey and achieve your health goals." />
-        <meta name="twitter:image" content="https://www.cloudyunicorn.com/assets/Logo/cover.png" />
+        <meta name="twitter:image" content="https://www.cloudyunicorn.com/assets/cover.png" />
 
         {/* Favicons */}
         <link rel="icon" href="/favicon.ico" />
