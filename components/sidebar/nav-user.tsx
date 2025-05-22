@@ -8,7 +8,7 @@ import {
   UserCircleIcon,
 } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,8 +25,10 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useUser } from '@/contexts/UserContext';
-import { useState, useEffect } from 'react';
 import { Spinner } from '@/components/ui/spinner';
+import { useTransition } from 'react';
+import { useEffect } from 'react';
+import { signOutAction } from "@/lib/actions/user.action";
 
 function getInitials(name?: string) {
   if (!name) return 'US';
@@ -37,23 +39,14 @@ function getInitials(name?: string) {
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user, isLoading, signOut, refreshUser } = useUser();
-  
+  const { user, isLoading, refreshUser } = useUser();
+  const [isPending, startTransition] = useTransition();
+
   useEffect(() => {
     if (!user && !isLoading) {
       refreshUser();
     }
   }, [user, isLoading, refreshUser]);
-  const [isSigningOut, setIsSigningOut] = useState(false);
-
-  const handleSignOut = async () => {
-    setIsSigningOut(true);
-    try {
-      await signOut();
-    } finally {
-      setIsSigningOut(false);
-    }
-  };
 
   return (
     <SidebarMenu>
@@ -72,8 +65,9 @@ export function NavUser() {
               ) : (
                 <>
                   <Avatar className="h-8 w-8 rounded-lg grayscale">
-                    {/* <AvatarImage src={user?.avatar} alt={user?.name} /> */}
-                    <AvatarFallback className="rounded-lg">{getInitials(user?.name)}</AvatarFallback>
+                    <AvatarFallback className="rounded-lg">
+                      {getInitials(user?.name)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user?.name}</span>
@@ -86,6 +80,7 @@ export function NavUser() {
               <MoreVerticalIcon className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? 'bottom' : 'right'}
@@ -95,8 +90,9 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  {/* <AvatarImage src={user?.avatar} alt={user?.name} /> */}
-                  <AvatarFallback className="rounded-lg">{getInitials(user?.name)}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {getInitials(user?.name)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user?.name}</span>
@@ -106,7 +102,9 @@ export function NavUser() {
                 </div>
               </div>
             </DropdownMenuLabel>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <UserCircleIcon />
@@ -121,20 +119,30 @@ export function NavUser() {
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
+
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-            >
-              <LogOutIcon />
-              {isSigningOut ? (
-                <div className="flex items-center gap-2">
-                  <Spinner size="sm" />
-                  Signing Out...
-                </div>
-              ) : (
-                'Sign Out'
-              )}
+
+            <DropdownMenuItem asChild>
+              <form
+                action={signOutAction}
+                className="w-full"
+                onSubmit={() => startTransition(() => {})}
+              >
+                <button
+                  type="submit"
+                  className="flex w-full items-center gap-2 text-sm"
+                >
+                  <LogOutIcon />
+                  {isPending ? (
+                    <div className="flex items-center gap-2">
+                      <Spinner size="sm" />
+                      Signing Out...
+                    </div>
+                  ) : (
+                    'Sign Out'
+                  )}
+                </button>
+              </form>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
