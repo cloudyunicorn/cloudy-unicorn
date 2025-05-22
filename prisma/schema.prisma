@@ -52,6 +52,7 @@ model User {
   workoutSessions WorkoutSession[]
   feedbacks       Feedback[]
   goals           FitnessGoal[]     @default([])
+  isSubscribed    Boolean?
 
   @@index([email, createdAt])
 }
