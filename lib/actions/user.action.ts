@@ -21,7 +21,7 @@ export async function signOutAction() {
     if (error) {
       console.error("Error signing out:", error);
     }
-    redirect("/");
+    return redirect("/");
 };
 
 export async function signInAction(values: FormValues) {
