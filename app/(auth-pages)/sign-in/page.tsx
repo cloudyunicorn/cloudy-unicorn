@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/contexts/UserContext';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert } from '@/components/ui/alert';
 import Logo from '@/components/Logo';
@@ -15,6 +16,7 @@ import { Spinner } from "@/components/ui/spinner";
 export default function SignInPage() {
   const supabase = useSupabase();
   const router = useRouter();
+  const { refreshUser } = useUser();
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -65,7 +67,8 @@ export default function SignInPage() {
         )}
 
         <SignInForm
-          onSuccess={() => {
+          onSuccess={async () => {
+            await refreshUser();
             router.push('/dashboard');
           }}
           onError={(message) => setErrorMsg(message)}
