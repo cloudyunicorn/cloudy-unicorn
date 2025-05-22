@@ -16,20 +16,15 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export async function signOutAction() {
+    const supabase = await createClient();
     try {
-        const supabase = await createClient();
         const { error } = await supabase.auth.signOut();
-        
-        if (error) {
-            console.error("Error signing out:", error);
-            throw error;
-        }
-        
-        return redirect("/");
+        if (error) throw error;
     } catch (error) {
-        console.error("Sign out failed:", error);
+        console.error("Supabase sign out error:", error);
         throw new Error("Sign out failed. Please try again.");
     }
+    return redirect("/");
 };
 
 export async function signInAction(values: FormValues) {
