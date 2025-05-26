@@ -5,8 +5,9 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Suspense, useEffect, useState } from 'react'
-import { getUserInfo } from '@/lib/actions/user.action'
+import { getUserInfo, updateUserName } from '@/lib/actions/user.action'
 import { UserMetadata } from "@supabase/supabase-js"
+import { toast } from 'sonner'
 
 export function UserSettings() {
   const [userData, setUserData] = useState<UserMetadata | null>(null);
@@ -31,6 +32,17 @@ export function UserSettings() {
     }
     fetchUser()
   }, [])
+
+  const handleNameUpdate = async () => {
+    try {
+      if (!userData?.name) return;
+      await updateUserName(userData.name);
+      toast.success('Name updated successfully!');
+    } catch (error) {
+      console.error('Failed to update name:', error);
+      toast.error('Failed to update name. Please try again.');
+    }
+  };
 
   if (loading) {
     return (
@@ -64,8 +76,16 @@ export function UserSettings() {
               type="name"
               className="w-auto"
               value={userData?.name || ''}
-              readOnly
+              onChange={(e) => setUserData(prev => ({
+                ...prev,
+                name: e.target.value
+              }))}
             />
+            <div className="pt-2">
+              <Button onClick={handleNameUpdate}>
+                Save Changes
+              </Button>
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>

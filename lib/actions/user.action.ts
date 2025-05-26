@@ -54,6 +54,47 @@ export async function getUserInfo() {
   return data.user;
 }
 
+export async function updateUserName(name: string) {
+  const supabase = await createClient();
+  
+  try {
+    // Verify authentication first
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error('User authentication failed:', authError);
+      throw new Error('User not authenticated');
+    }
+
+    // Update both Supabase metadata and database
+    const [supabaseResult, dbUser] = await Promise.all([
+      supabase.auth.updateUser({ data: { name } }),
+      prisma.user.update({
+        where: { authId: user.id },
+        data: { name },
+        select: { id: true, name: true }
+      })
+    ]);
+
+    if (supabaseResult.error) {
+      console.error('Error updating Supabase user:', supabaseResult.error);
+      throw new Error('Failed to update name in authentication system');
+    }
+
+    if (!dbUser) {
+      console.error('Failed to update database user record');
+      throw new Error('Failed to update name in database');
+    }
+
+    return { 
+      ...supabaseResult.data.user,
+      name: dbUser.name
+    };
+  } catch (error) {
+    console.error('Error updating user name:', error);
+    throw new Error('Failed to update user name');
+  }
+}
+
 // --- Fetch User Profile and Goals Action ---
 export async function getUserProfileAndGoals() {
   'use server';
