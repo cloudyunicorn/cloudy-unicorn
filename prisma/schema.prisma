@@ -53,6 +53,7 @@ model User {
   feedbacks       Feedback[]
   goals           FitnessGoal[]     @default([])
   isSubscribed    Boolean?
+  calorieLogs     CalorieLog[]
 
   @@index([email, createdAt])
 }
@@ -252,4 +253,26 @@ model Feedback {
   updatedAt    DateTime   @updatedAt @map("updated_at")
 
   @@index([userId, status, createdAt])
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+model CalorieLog {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  date         DateTime   @default(now())
+  mealType     MealType
+  food         String
+  calories     Int
+  notes        String?
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@index([userId, date])
+  @@index([userId, mealType])
 }

@@ -10,6 +10,7 @@ import {
   DatabaseIcon,
   Dumbbell,
   FileIcon,
+  Flame,
   HeartHandshake,
   LayoutDashboardIcon,
   MessageCircle,
@@ -42,6 +43,7 @@ import { ExerciseTrack } from "../exercise-track"
 import { UserSettings } from "../settings";
 import Link from "next/link";
 import Subscription from "../Subscription";
+import { TrackCalories } from "../track-calories";
 
 export interface NavItem {
   title: string;
@@ -92,6 +94,11 @@ export const data = {
       title: 'Exercise Tracking',
       component: ExerciseTrack,
       icon: BicepsFlexed,
+    },
+    {
+      title: 'Track Calories',
+      component: TrackCalories,
+      icon: Flame,
     },
   ],
   navSecondary: [
