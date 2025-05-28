@@ -85,11 +85,30 @@ const config = {
   				to: {
   					height: '0'
   				}
+  			},
+  			'rotate-180': {
+  				from: {
+  					transform: 'rotate(0deg)'
+  				},
+  				to: {
+  					transform: 'rotate(180deg)'
+  				}
+  			},
+  			'fade-in': {
+  				from: { opacity: '0' },
+  				to: { opacity: '1' }
+  			},
+  			'fade-out': {
+  				from: { opacity: '1' },
+  				to: { opacity: '0' }
   			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+  			'rotate-90': 'rotate-90 0.2s ease-in-out',
+  			'fade-in': 'fade-in 0.2s ease-in-out',
+  			'fade-out': 'fade-out 0.2s ease-in-out'
   		}
   	}
   },
