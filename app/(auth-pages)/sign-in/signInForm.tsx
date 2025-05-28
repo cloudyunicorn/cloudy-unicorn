@@ -31,6 +31,8 @@ interface SignInFormProps {
 }
 
 export function SignInForm({ onSuccess, onError }: SignInFormProps) {
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL
+
   const supabase = useSupabase();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -49,7 +51,7 @@ export function SignInForm({ onSuccess, onError }: SignInFormProps) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${location.origin}/auth/callback`,
+          redirectTo: `${SITE_URL}/auth/callback`,
         },
       });
       if (error) throw error;
