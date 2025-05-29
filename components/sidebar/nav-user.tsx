@@ -42,8 +42,6 @@ export function NavUser() {
   const { user, isLoading, refreshUser } = useUser();
   const [isPending, startTransition] = useTransition();
 
-  console.log(user)
-
   useEffect(() => {
     if (!user && !isLoading) {
       refreshUser();
@@ -66,7 +64,7 @@ export function NavUser() {
                 </div>
               ) : (
                 <>
-                  <Avatar className="h-8 w-8 rounded-lg grayscale">
+                  <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage src={user?.avatar_url} alt="User Avatar" />
                     <AvatarFallback className="rounded-lg">
                       {getInitials(user?.name)}
