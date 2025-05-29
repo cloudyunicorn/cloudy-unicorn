@@ -22,7 +22,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Spinner } from '@/components/ui/spinner';
 import { UserMetadata } from '@supabase/supabase-js';
 import { TransitionStartFunction } from 'react';
@@ -65,6 +65,7 @@ export default function MenuDropdown({
               </div>
             ) : (
               <Avatar className="h-full w-full">
+                <AvatarImage src={user?.avatar_url} alt="User Avatar" />
                 <AvatarFallback>
                   {getInitials(user?.name?.split(' ')[0])}
                 </AvatarFallback>
@@ -77,6 +78,7 @@ export default function MenuDropdown({
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarImage src={user?.avatar_url} alt="User Avatar" />
               <AvatarFallback className="rounded-lg">
                 {getInitials(user?.name?.split(' ')[0])}
               </AvatarFallback>
