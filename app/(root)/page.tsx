@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 import { ArrowRight } from 'lucide-react'; // Added ArrowRight
-import Subscription from "@/components/Subscription";
+import Subscription from "@/components/pricing";
 
 export default async function Home() {
   return (

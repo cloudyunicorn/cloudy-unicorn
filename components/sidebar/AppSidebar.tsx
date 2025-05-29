@@ -42,7 +42,7 @@ import ProgressTrack from "../progress-track";
 import { ExerciseTrack } from "../exercise-track"
 import { UserSettings } from "../settings";
 import Link from "next/link";
-import Subscription from "../Subscription";
+import Subscription from "../pricing";
 import { TrackCalories } from "../track-calories";
 
 export interface NavItem {

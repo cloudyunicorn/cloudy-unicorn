@@ -1,8 +1,15 @@
-import React from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Badge } from '@/components/ui/badge'
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 const Subscription = () => {
   const plans = [
@@ -13,22 +20,23 @@ const Subscription = () => {
         'Basic workout tracking',
         '3 meal plans per week',
         'Standard analytics',
-        'Community support'
+        'Community support',
       ],
-      cta: 'Get Started'
+      cta: 'Get Started',
     },
     {
       title: 'Pro',
-      price: '$9.99',
+      price: '₹ 499',
       features: [
         'Advanced workout tracking',
         '7 meal plans per week',
         'Detailed analytics',
         'Priority support',
-        'Custom workout plans'
+        'Custom workout plans',
       ],
       cta: 'Upgrade Now',
-      featured: true
+      featured: true,
+      href: '/pricing/element',
     },
     {
       title: 'Enterprise',
@@ -39,11 +47,11 @@ const Subscription = () => {
         'Dedicated support',
         'Custom integrations',
         'API access',
-        'White-label options'
+        'White-label options',
       ],
-      cta: 'Contact Sales'
-    }
-  ]
+      cta: 'Contact Sales',
+    },
+  ];
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8">
@@ -102,18 +110,20 @@ const Subscription = () => {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button
-                variant={plan.featured ? 'default' : 'outline'}
-                className="w-full"
-              >
-                {plan.cta}
-              </Button>
+              <Link href={plan.href || '/pricing'}>
+                <Button
+                  variant={plan.featured ? 'default' : 'outline'}
+                  className="w-full"
+                >
+                  {plan.cta}
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Subscription
+export default Subscription;
