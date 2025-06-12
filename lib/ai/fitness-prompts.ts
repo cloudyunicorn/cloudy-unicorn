@@ -125,3 +125,27 @@ Respond with:
 
 - Ask the user if they Would you like a sample meal plan or workout routine? Sign Up our platform(don't give any links) - AI fitness platform - get started for free`;
 };
+
+export const getFoodSearchPrompt = (context: FitnessContext, query: string): string => {
+  return `As a nutritionist, provide detailed nutritional information for: ${query}
+  
+User Context:
+- Dietary preferences: ${context.diet}
+- Health conditions: ${context.healthConditions.join(', ') || 'none'}
+- Goals: ${context.goals.join(', ')}
+
+Respond with the following in the exact format:
+
+Name: [Food Name]
+Serving: [Serving Size]
+Calories: [number]
+Protein: [number] g
+Carbohydrates: [number] g
+Fats: [number] g
+Fiber: [number] g
+Sugar: [number] g
+Benefits: [text]
+Comparison: [text]
+
+Do not add any other text.`;
+};

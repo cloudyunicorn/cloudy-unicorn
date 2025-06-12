@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalorieLogForm } from './CalorieLogForm';
 import { CalorieHistory } from './CalorieHistory';
 import { CalorieProvider } from '@/contexts/CalorieContext';
+import FoodSearch from './FoodSearch';
 
 export function TrackCalories() {
   return (
@@ -16,7 +17,8 @@ export function TrackCalories() {
           </TabsList>
           
           <TabsContent value="log">
-            <div className="p-4 rounded-lg border">
+            <FoodSearch />
+            <div className="p-4 rounded-lg border mt-4">
               <CalorieLogForm />
             </div>
           </TabsContent>
