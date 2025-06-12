@@ -9,16 +9,16 @@ import {
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
-import { ArrowRight } from 'lucide-react'; // Added ArrowRight
+import { ArrowRight } from 'lucide-react';
 import Subscription from "@/components/pricing";
+import ThemeAwareBackground from "@/components/ThemeAwareBackground";
 
 export default async function Home() {
   return (
-    <main className="flex-1">
+    <main className="flex-1 relative">
+      <ThemeAwareBackground />
       {/* Hero Section - Enhanced Background and Padding */}
-      <div className="relative flex items-center justify-center bg-gradient-to-b from-background via-background/90 to-background">
-        {/* Optional: Add a subtle pattern or overlay here if desired */}
-        {/* <div className="absolute inset-0 bg-[url('/path/to/pattern.svg')] opacity-5"></div> */}
+      <div className="relative flex items-center justify-center">
         <div className="max-w-7xl px-6 py-24 md:py-32 lg:py-40 mx-auto text-center z-10">
           <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full border border-primary/20 bg-primary/10 shadow-sm">
             <Sparkles className="h-5 w-5 text-primary" />
