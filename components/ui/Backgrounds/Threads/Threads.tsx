@@ -138,7 +138,7 @@ const Threads: React.FC<ThreadsProps> = ({
   ...rest
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationFrameId = useRef<number>();
+  const animationFrameId = useRef<number | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -216,11 +216,14 @@ const Threads: React.FC<ThreadsProps> = ({
       renderer.render({ scene: mesh });
       animationFrameId.current = requestAnimationFrame(update);
     }
-    animationFrameId.current = requestAnimationFrame(update);
+    const frameId = requestAnimationFrame(update);
+    animationFrameId.current = frameId;
 
     return () => {
-      if (animationFrameId.current)
+      if (animationFrameId.current !== null) {
         cancelAnimationFrame(animationFrameId.current);
+        animationFrameId.current = null;
+      }
       window.removeEventListener("resize", resize);
 
       if (enableMouseInteraction) {
