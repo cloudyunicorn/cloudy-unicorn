@@ -20,9 +20,9 @@ export default function ThemeAwareBackground() {
 
   return (
     <div className="fixed -inset-y-40 -z-10 h-screen w-full">
-      {theme === 'dark' ? (
+      {/* {theme === 'dark' ? (
         <Threads color={[0.6, 0.2, 0.8]} amplitude={0.3} distance={0.2} enableMouseInteraction={false} />
-      ) : null}
+      ) : null} */}
     </div>
   );
 }
