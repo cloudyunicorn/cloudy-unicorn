@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Modetoggle from './mode-toggle';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { AlignJustify, UserPen, Loader2 } from 'lucide-react';
+import { AlignJustify, UserPen } from 'lucide-react';
 import {
   Sheet,
   SheetContent,

@@ -18,14 +18,14 @@ export async function* getFitnessResponse(
       controller.abort();
     }, API_TIMEOUT);
 
-    response = await fetch("https://llm.chutes.ai/v1/chat/completions", {
+    response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_CHUTES_API_TOKEN}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "deepseek-ai/DeepSeek-V3-0324",
+        model: "deepseek/deepseek-chat-v3-0324:free",
         messages: [
           {
             role: "system",
