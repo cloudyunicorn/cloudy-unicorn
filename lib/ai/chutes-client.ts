@@ -25,7 +25,7 @@ export async function* getFitnessResponse(
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-chat-v3-0324:free",
+        model: "x-ai/grok-4-fast:free",
         messages: [
           {
             role: "system",
