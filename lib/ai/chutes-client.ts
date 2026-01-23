@@ -1,6 +1,6 @@
 import { FitnessContext, ChutesAPIResponse, APIError } from '@/lib/ai/types';
 
-const API_TIMEOUT = 60000; // 30 seconds
+const API_TIMEOUT = 120000; // 120 seconds for reasoning models
 const MAX_RETRIES = 2;
 
 export async function* getFitnessResponse(
@@ -9,7 +9,7 @@ export async function* getFitnessResponse(
   retries = MAX_RETRIES
 ): AsyncGenerator<string, void, unknown> {
   const controller = new AbortController();
-  let timeoutId: NodeJS.Timeout | null = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let response: Response;
 
   try {
@@ -22,14 +22,16 @@ export async function* getFitnessResponse(
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_CHUTES_API_TOKEN}`,
+        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "https://cloudyunicorn.com",
+        "X-Title": "Cloudy Unicorn",
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-chat-v3.1:free",
+        model: "xiaomi/mimo-v2-flash:free",
         messages: [
           {
             role: "system",
-            content: `You are an expert fitness coach. User context: 
+            content: `You are an expert fitness coach. Be concise and direct. User context: 
             Goals: ${context.goals.join(', ')}
             Dietary Preferences: ${context.diet || 'none'}
             Fitness Level: ${context.fitnessLevel}
@@ -41,7 +43,7 @@ export async function* getFitnessResponse(
           }
         ],
         stream: true,
-        max_tokens: 5120,
+        max_tokens: 4096,
         temperature: 0.7
       }),
       signal: controller.signal
@@ -59,7 +61,7 @@ export async function* getFitnessResponse(
 
     const decoder = new TextDecoder();
     let buffer = '';
-    
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -74,8 +76,11 @@ export async function* getFitnessResponse(
         if (line.startsWith('data: ') && !line.includes('[DONE]')) {
           try {
             const data = JSON.parse(line.substring(6));
-            if (data.choices?.[0]?.delta?.content) {
-              yield data.choices[0].delta.content;
+            const delta = data.choices?.[0]?.delta;
+            // R1 model streams reasoning first, then content - use both
+            const text = delta?.content || delta?.reasoning || '';
+            if (text) {
+              yield text;
             }
           } catch (e) {
             console.error('Error parsing stream data:', e);
@@ -85,16 +90,15 @@ export async function* getFitnessResponse(
     }
 
   } catch (error) {
-    if (retries > 0 && 
-        (error instanceof TypeError || // Network errors
-         (error instanceof Error && error.name === 'AbortError') || // Timeout
-         (error instanceof Error && error.message.includes('500')))) { // Server errors
+    if (retries > 0 &&
+      (error instanceof TypeError || // Network errors
+        (error instanceof Error && error.name === 'AbortError') || // Timeout
+        (error instanceof Error && error.message.includes('500')))) { // Server errors
       yield* getFitnessResponse(userMessage, context, retries - 1);
       return;
     }
-    throw new Error(`Failed to get fitness response: ${
-      error instanceof Error ? error.message : 'Unknown error'
-    }`);
+    throw new Error(`Failed to get fitness response: ${error instanceof Error ? error.message : 'Unknown error'
+      }`);
   } finally {
     if (timeoutId) {
       clearTimeout(timeoutId);
