@@ -4,7 +4,7 @@ import MenuDropdown from "@/components/header/menu-mob";
 import Modetoggle from '@/components/header/mode-toggle';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { signOutAction } from "@/lib/actions/user.action";
+
 import { useUser } from '@/contexts/UserContext';
 import { useEffect, useTransition } from 'react';
 
@@ -20,7 +20,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ activeItem }: DashboardHeaderProps) {
-  const { user, isLoading, refreshUser } = useUser();
+  const { user, isLoading, refreshUser, signOut } = useUser();
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function DashboardHeader({ activeItem }: DashboardHeaderProps) {
           <h1 className="text-base font-medium">{activeItem}</h1>
           <div className="md:hidden">
             <MenuDropdown
-              onSignOut={signOutAction}
+              onSignOut={signOut}
               user={user}
               isLoading={isLoading}
               getInitials={getInitials}

@@ -74,7 +74,7 @@ export function SignInForm({ onSuccess, onError }: SignInFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <Button
           type="button"
           variant="outline"

@@ -1,4 +1,4 @@
-    "use client"
+"use client"
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,10 +8,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { signOutAction } from "@/lib/actions/user.action";
+import { useUser } from '@/contexts/UserContext';
 
 const UserButton = () => {
-  
+  const { signOut } = useUser();
+
   return (
     <div className="flex gap-2 items-center">
       <DropdownMenu>
@@ -46,23 +47,11 @@ const UserButton = () => {
             </Link>
           </DropdownMenuItem>
 
-          {/* {session?.user?.role === 'admin' && (
-            <DropdownMenuItem>
-              <Link href='/admin/overview' className='w-full'>
-                Admin
-              </Link>
-            </DropdownMenuItem>
-          )} */}
-
-          <DropdownMenuItem className="p-0 mb-1">
-            <form action={signOutAction}>
-              <Button
-                className="w-full py-4 px-2 h-4 justify-start"
-                variant="ghost"
-              >
-                Sign Out
-              </Button>
-            </form>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => signOut()}
+          >
+            Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

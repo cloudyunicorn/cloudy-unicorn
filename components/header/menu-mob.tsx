@@ -29,7 +29,7 @@ import { TransitionStartFunction } from 'react';
 import { Button } from '../ui/button';
 
 export type MenuDropdownProps = {
-  onSignOut: () => void;
+  onSignOut: () => Promise<void>;
   user: UserMetadata | null;
   isLoading: boolean;
   getInitials: (name?: string) => string;
@@ -111,27 +111,19 @@ export default function MenuDropdown({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem asChild>
-          <form
-            action={onSignOut}
-            className="w-full"
-            onSubmit={() => startTransition(() => {})}
-          >
-            <button
-              type="submit"
-              className="flex w-full items-center gap-2 text-sm"
-            >
-              <LogOutIcon className="mr-2 h-4 w-4" />
-              {isPending ? (
-                <div className="flex items-center gap-2">
-                  <Spinner size="sm" />
-                  Signing Out...
-                </div>
-              ) : (
-                'Sign Out'
-              )}
-            </button>
-          </form>
+        <DropdownMenuItem
+          onClick={() => startTransition(async () => { await onSignOut(); })}
+          className="flex w-full items-center gap-2 text-sm cursor-pointer"
+        >
+          <LogOutIcon className="mr-2 h-4 w-4" />
+          {isPending ? (
+            <div className="flex items-center gap-2">
+              <Spinner size="sm" />
+              Signing Out...
+            </div>
+          ) : (
+            'Sign Out'
+          )}
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

@@ -1,8 +1,10 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getUserInfo, signOutAction } from '@/lib/actions/user.action';
+import { getUserInfo } from '@/lib/actions/user.action';
 import { UserMetadata } from "@supabase/supabase-js";
+import { useSupabase } from '@/providers/supabase-provider';
+import { useRouter } from 'next/navigation';
 
 interface UserContextProps {
   user: UserMetadata | null;
@@ -19,6 +21,8 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
+  const supabase = useSupabase();
+  const router = useRouter();
   const [user, setUser] = useState<UserMetadata | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -39,8 +43,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   const handleSignOut = async () => {
     try {
-      await signOutAction();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Supabase sign out error:", error.message);
+        throw new Error("Sign out failed. Please try again.");
+      }
       setUser(null);
+      router.push('/');
+      router.refresh();
     } catch (err) {
       console.error("Error signing out:", err);
       throw err;

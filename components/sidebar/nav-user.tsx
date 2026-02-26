@@ -28,7 +28,7 @@ import { useUser } from '@/contexts/UserContext';
 import { Spinner } from '@/components/ui/spinner';
 import { useTransition } from 'react';
 import { useEffect } from 'react';
-import { signOutAction } from "@/lib/actions/user.action";
+
 
 function getInitials(name?: string) {
   if (!name) return 'US';
@@ -39,7 +39,7 @@ function getInitials(name?: string) {
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user, isLoading, refreshUser } = useUser();
+  const { user, isLoading, refreshUser, signOut } = useUser();
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -124,27 +124,19 @@ export function NavUser() {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem asChild>
-              <form
-                action={signOutAction}
-                className="w-full"
-                onSubmit={() => startTransition(() => {})}
-              >
-                <button
-                  type="submit"
-                  className="flex w-full items-center gap-2 text-sm"
-                >
-                  <LogOutIcon />
-                  {isPending ? (
-                    <div className="flex items-center gap-2">
-                      <Spinner size="sm" />
-                      Signing Out...
-                    </div>
-                  ) : (
-                    'Sign Out'
-                  )}
-                </button>
-              </form>
+            <DropdownMenuItem
+              onClick={() => startTransition(async () => { await signOut(); })}
+              className="flex w-full items-center gap-2 text-sm cursor-pointer"
+            >
+              <LogOutIcon />
+              {isPending ? (
+                <div className="flex items-center gap-2">
+                  <Spinner size="sm" />
+                  Signing Out...
+                </div>
+              ) : (
+                'Sign Out'
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
