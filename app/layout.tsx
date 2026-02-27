@@ -5,8 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import { UserProvider } from '@/contexts/UserContext';
 import './globals.css';
 import { SupabaseProvider } from '@/providers/supabase-provider';
-import { Toaster, toast } from 'sonner';
-import { useEffect, useState } from 'react';
+import { Toaster } from 'sonner';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -20,42 +19,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
-  const [showInstall, setShowInstall] = useState(false);
-
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setInstallPrompt(e);
-      // Show install toast next render
-      setShowInstall(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-  }, []);
-
-  useEffect(() => {
-    if (showInstall && installPrompt && !sessionStorage.getItem('pwaPromptShown')) {
-      toast('Add to home screen for better experience', {
-        duration: 10000,
-        action: {
-          label: 'Install',
-          onClick: async () => {
-            const promptEvent = installPrompt as any;
-            promptEvent.prompt();
-            const { outcome } = await promptEvent.userChoice;
-            if (outcome === 'accepted') {
-              sessionStorage.removeItem('pwaPromptShown');
-              setShowInstall(false);
-            }
-          },
-        },
-        className: 'cursor-pointer',
-      });
-      sessionStorage.setItem('pwaPromptShown', 'true');
-    }
-  }, [showInstall, installPrompt]);
 
   return (
     <html lang="en" className={`${geistSans.className} antialiased`} suppressHydrationWarning>
@@ -65,7 +28,7 @@ export default function RootLayout({
         <title>Cloudy Unicorn | AI-Powered Fitness & Nutrition Platform</title>
         <meta name="description" content="Cloudy Unicorn provides personalized workout plans and meal recommendations powered by AI. Track your fitness journey, get smart nutrition advice, and achieve your health goals." />
         <link rel="canonical" href="https://www.cloudyunicorn.com" />
-        
+
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.cloudyunicorn.com" />
@@ -120,17 +83,17 @@ export default function RootLayout({
         <body>
           <UserProvider>
             <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <main>
-              {children}
-              <SpeedInsights />
-              <Analytics />
-            </main>
-            <Toaster position="top-center" expand={false} visibleToasts={1} richColors />
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <main>
+                {children}
+                <SpeedInsights />
+                <Analytics />
+              </main>
+              <Toaster position="top-center" expand={false} visibleToasts={1} richColors />
             </ThemeProvider>
           </UserProvider>
         </body>
