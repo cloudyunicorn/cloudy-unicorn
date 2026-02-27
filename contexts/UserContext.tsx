@@ -44,13 +44,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       // Use server action to sign out — runs on Vercel's servers,
       // bypassing ISP blocks on *.supabase.co domains
       await signOutAction();
-      setUser(null);
-      router.push('/');
-      router.refresh();
     } catch (err) {
       console.error("Error signing out:", err);
-      throw err;
     }
+    // Always redirect, even if the server action had an issue.
+    // Use hard redirect to fully clear client-side auth state & cookies.
+    setUser(null);
+    window.location.href = '/';
   };
 
   useEffect(() => {
