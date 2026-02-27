@@ -3,16 +3,18 @@ import { createClient } from '@/utils/supabase/server';
 
 const API_TIMEOUT = 120000;
 
-export async function POST(req: NextRequest) {
-    // Verify the user is authenticated
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+// Allow up to 60 seconds for streaming AI responses on Vercel
+export const maxDuration = 60;
 
-    if (authError || !user) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-            status: 401,
-            headers: { 'Content-Type': 'application/json' },
-        });
+export async function POST(req: NextRequest) {
+    // Auth is optional — the free body assessment page uses this without login
+    // For production, consider adding rate limiting for unauthenticated requests
+    const supabase = await createClient();
+    try {
+        await supabase.auth.getUser();
+    } catch (error) {
+        // Unauthenticated requests are allowed, so we just log or ignore the error
+        console.warn("Authentication check failed, proceeding with unauthenticated request.", error);
     }
 
     const { message, context } = await req.json();
@@ -99,6 +101,22 @@ export async function POST(req: NextRequest) {
                                 } catch {
                                     // Skip malformed JSON chunks
                                 }
+                            }
+                        }
+                    }
+
+                    // Process any remaining data in the buffer
+                    if (buffer.trim()) {
+                        const line = buffer.trim();
+                        if (line.startsWith('data: ') && !line.includes('[DONE]')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+                                const text = data.choices?.[0]?.delta?.content || '';
+                                if (text) {
+                                    streamController.enqueue(new TextEncoder().encode(text));
+                                }
+                            } catch {
+                                // Skip malformed JSON
                             }
                         }
                     }
