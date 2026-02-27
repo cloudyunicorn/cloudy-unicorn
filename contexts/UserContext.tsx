@@ -1,9 +1,8 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getUserInfo } from '@/lib/actions/user.action';
+import { getUserInfo, signOutAction } from '@/lib/actions/user.action';
 import { UserMetadata } from "@supabase/supabase-js";
-import { useSupabase } from '@/providers/supabase-provider';
 import { useRouter } from 'next/navigation';
 
 interface UserContextProps {
@@ -21,7 +20,6 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const supabase = useSupabase();
   const router = useRouter();
   const [user, setUser] = useState<UserMetadata | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -43,11 +41,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Supabase sign out error:", error.message);
-        throw new Error("Sign out failed. Please try again.");
-      }
+      // Use server action to sign out — runs on Vercel's servers,
+      // bypassing ISP blocks on *.supabase.co domains
+      await signOutAction();
       setUser(null);
       router.push('/');
       router.refresh();

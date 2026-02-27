@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { FitnessGoal, DifficultyLevel, Gender, ActivityLevel } from '@prisma/client';
@@ -22,9 +21,7 @@ export async function signOutAction() {
     console.error("Supabase sign out error:", error.message);
     throw new Error("Sign out failed. Please try again.");
   }
-
-  // ✅ Use redirect on server
-  redirect("/");
+  return { success: true };
 }
 
 export async function signInAction(values: FormValues) {
@@ -56,7 +53,7 @@ export async function getUserInfo() {
 
 export async function updateUserName(name: string) {
   const supabase = await createClient();
-  
+
   try {
     // Verify authentication first
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -85,7 +82,7 @@ export async function updateUserName(name: string) {
       throw new Error('Failed to update name in database');
     }
 
-    return { 
+    return {
       ...supabaseResult.data.user,
       name: dbUser.name
     };
@@ -159,7 +156,7 @@ export async function getUserProfileAndGoals() {
         },
         progressLogs: {
           orderBy: { loggedAt: 'desc' },
-          select: { 
+          select: {
             id: true,
             type: true,
             value: true,
@@ -317,7 +314,7 @@ export async function updateUserProfileAndGoals(formData: BodyInfoFormDataServer
   } catch (error) {
     console.error("Error updating user profile/goals:", error);
     if (error instanceof z.ZodError) {
-       return { error: "Validation failed on server.", details: error.flatten() };
+      return { error: "Validation failed on server.", details: error.flatten() };
     }
     return { error: "An unexpected error occurred while updating your profile." };
   }
