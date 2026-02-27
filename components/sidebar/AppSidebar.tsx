@@ -146,14 +146,14 @@ export function AppSidebar({
   const { setOpenMobile } = useSidebar();
 
   const handleSelectComponent = (
-    title: string, 
+    title: string,
     callback: () => React.ComponentType<any> | null
   ) => {
     onSelectComponent(title, callback);
     setOpenMobile(false);
   };
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -172,11 +172,11 @@ export function AppSidebar({
         {/* Pass onSelectComponent so NavMain can trigger inline component changes if needed */}
         <NavMain items={data.navMain} activeItem={activeItem} onSelectComponent={handleSelectComponent} />
         {/* <NavDocuments items={data.documents} /> */}
-        <NavSecondary 
-          items={data.navSecondary} 
+        <NavSecondary
+          items={data.navSecondary}
           activeItem={activeItem}
           onSelectComponent={handleSelectComponent}
-          className="mt-auto" 
+          className="mt-auto"
         />
       </SidebarContent>
       <SidebarFooter>
