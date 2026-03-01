@@ -54,11 +54,10 @@ export function NavSecondary({
                       onSelectComponent(item.title, () => item.component!);
                     }
                   }}
-                  className={`${
-                    activeItem === item.title
+                  className={`${activeItem === item.title
                       ? 'bg-sidebar-select'
                       : ''
-                  }`}
+                    }`}
                 >
                   {item.icon && <item.icon size={20} />}
                   <span>{item.title}</span>

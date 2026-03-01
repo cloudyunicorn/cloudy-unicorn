@@ -59,16 +59,16 @@ export default function DashboardLayout({
 
   return (
     <DataProvider>
-      <SidebarProvider>
+      <SidebarProvider className="h-screen overflow-hidden w-full m-0 p-0 flex">
         <AppSidebar
           items={data.navMain}
           activeItem={activeItem}
           onSelectComponent={handleSelectComponent}
           variant="inset"
         />
-        <SidebarInset>
+        <SidebarInset className="flex-1 flex flex-col h-screen overflow-hidden">
           <DashboardHeader activeItem={activeItem} />
-          <div className="flex flex-1 flex-col mb-16 md:mb-0">
+          <div className="flex flex-1 flex-col mb-16 md:mb-0 overflow-y-auto w-full p-2 md:p-6" id="dashboard-scroll-area">
             {isLoading ? (
               <div className="flex flex-1 items-center justify-center">
                 <Spinner size="lg" />
