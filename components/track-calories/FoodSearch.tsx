@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FitnessContext } from '@/lib/ai/types';
+import { RateLimitAlert } from '@/components/ui/rate-limit-alert';
 
 const FoodSearch: React.FC = () => {
   const [query, setQuery] = useState('');
@@ -17,15 +18,16 @@ const FoodSearch: React.FC = () => {
   const [nutritionData, setNutritionData] = useState<any>(null);
   const [rawResponse, setRawResponse] = useState<string>('');
   const [showRaw, setShowRaw] = useState<boolean>(false);
+  const [showRateLimitAlert, setShowRateLimitAlert] = useState(false);
   const { addCalorie } = useCalorie();
 
   const handleSearch = async () => {
     if (!query.trim()) return;
-    
+
     setLoading(true);
     setError(null);
     setNutritionData(null);
-    
+
     try {
       // Get user context (simplified for now - should come from actual user data)
       const userContext: FitnessContext = {
@@ -42,22 +44,26 @@ const FoodSearch: React.FC = () => {
           targetWeight: 75
         }
       };
-      
+
       const prompt = getFoodSearchPrompt(userContext, `${quantity}g of ${query}`);
       const generator = getFitnessResponse(prompt, userContext);
-      
+
       let fullResponse = '';
       for await (const chunk of generator) {
         fullResponse += chunk;
         // Update raw response for debugging
         setRawResponse(fullResponse);
       }
-      
+
       // Parse the AI response
       const parsedData = parseNutritionResponse(fullResponse);
       setNutritionData(parsedData);
-    } catch (err) {
-      setError('Failed to fetch nutrition data. Please try again.');
+    } catch (err: any) {
+      if (err instanceof Error && err.message.includes('daily limit')) {
+        setShowRateLimitAlert(true);
+      } else {
+        setError('Failed to fetch nutrition data. Please try again.');
+      }
       console.error('Food search error:', err);
     } finally {
       setLoading(false);
@@ -109,7 +115,7 @@ const FoodSearch: React.FC = () => {
         }
       }
     }
-    
+
     return result;
   };
 
@@ -123,7 +129,7 @@ const FoodSearch: React.FC = () => {
       formData.append('carbs', nutritionData.nutrition.carbs || '0');
       formData.append('fats', nutritionData.nutrition.fats || '0');
       formData.append('mealType', 'SNACK'); // Default to snack
-      
+
       try {
         await addCalorie(formData);
       } catch (err) {
@@ -165,17 +171,17 @@ const FoodSearch: React.FC = () => {
               </Button>
             </div>
           </div>
-          
+
           {error && (
             <div className="text-red-500 text-sm">{error}</div>
           )}
-          
+
           {nutritionData && (
             <div className="mt-4">
               <h3 className="font-semibold text-lg mb-2">
                 {nutritionData.name} ({quantity}g)
               </h3>
-              
+
               <Table className="mb-4">
                 <TableHeader>
                   <TableRow>
@@ -210,17 +216,17 @@ const FoodSearch: React.FC = () => {
                   </TableRow>
                 </TableBody>
               </Table>
-              
+
               <div className="mb-4">
                 <h4 className="font-medium mb-1">Health Benefits</h4>
                 <p className="text-sm">{nutritionData.benefits || 'No benefits information available.'}</p>
               </div>
-              
+
               <div className="mb-4">
                 <h4 className="font-medium mb-1">Comparison</h4>
                 <p className="text-sm">{nutritionData.comparison || 'No comparison information available.'}</p>
               </div>
-              
+
               <Button onClick={handleAddToLog} variant="outline">
                 Add to Calorie Log
               </Button>
@@ -229,8 +235,8 @@ const FoodSearch: React.FC = () => {
 
           {rawResponse && (
             <div className="mt-4">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => setShowRaw(!showRaw)}
               >
@@ -245,6 +251,10 @@ const FoodSearch: React.FC = () => {
           )}
         </div>
       </CardContent>
+      <RateLimitAlert
+        isOpen={showRateLimitAlert}
+        onClose={() => setShowRateLimitAlert(false)}
+      />
     </Card>
   );
 };

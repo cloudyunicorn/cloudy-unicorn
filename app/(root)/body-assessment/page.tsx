@@ -29,6 +29,7 @@ import {
 } from '@/utils/body-calculations';
 import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 import Link from 'next/link';
+import { RateLimitAlert } from '@/components/ui/rate-limit-alert';
 
 export default function BodyAssessmentPage() {
   const [bmi, setBmi] = useState<number | null>(null);
@@ -43,6 +44,8 @@ export default function BodyAssessmentPage() {
   const [aiResponse, setAiResponse] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [lastAIRefresh, setLastAIRefresh] = useState<number>(0);
+  const [showRateLimitAlert, setShowRateLimitAlert] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
@@ -120,8 +123,12 @@ export default function BodyAssessmentPage() {
         fullResponse += chunk;
         setAiResponse(fullResponse);
       }
-    } catch (error) {
-      setAiResponse('Could not get AI recommendations at this time.');
+    } catch (error: any) {
+      if (error instanceof Error && error.message.includes('daily limit')) {
+        setShowRateLimitAlert(true);
+      } else {
+        setAiResponse('Could not get AI recommendations at this time.');
+      }
     } finally {
       setIsStreaming(false);
     }
@@ -343,6 +350,11 @@ export default function BodyAssessmentPage() {
           </DialogContent>
         </Dialog>
       )}
+
+      <RateLimitAlert
+        isOpen={showRateLimitAlert}
+        onClose={() => setShowRateLimitAlert(false)}
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import prisma from "@/lib/prisma";
 
 const API_TIMEOUT = 120000;
 
@@ -10,12 +11,65 @@ export async function POST(req: NextRequest) {
     // Auth is optional — the free body assessment page uses this without login
     // For production, consider adding rate limiting for unauthenticated requests
     const supabase = await createClient();
+    let user = null;
     try {
-        await supabase.auth.getUser();
+        const { data } = await supabase.auth.getUser();
+        user = data.user;
     } catch (error) {
         // Unauthenticated requests are allowed, so we just log or ignore the error
         console.warn("Authentication check failed, proceeding with unauthenticated request.", error);
     }
+
+    // --- AI GENERATION RATE LIMITING LOGIC ---
+    const ip = req.headers.get("x-forwarded-for")?.split(',')[0] || "unknown";
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // If user is authenticated, check their specific limit. Otherwise fallback to IP limit.
+    let userIdForLimit = null;
+    if (user) {
+        const dbUser = await prisma.user.findUnique({
+            where: { authId: user.id },
+            select: { id: true }
+        });
+        if (dbUser) userIdForLimit = dbUser.id;
+    }
+
+    try {
+        // @ts-ignore
+        const generationCount = await prisma.aIGenerationLog.count({
+            where: {
+                createdAt: { gte: today },
+                ...(userIdForLimit ? { userId: userIdForLimit } : { ipAddress: ip }),
+            },
+        });
+
+        if (generationCount >= 5) {
+            return new Response(JSON.stringify({ error: 'You have reached your daily limit of 5 AI generations. Please try again tomorrow.' }), {
+                status: 429,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
+        // Log the generation right before proceeding with generation
+        // @ts-ignore
+        await prisma.aIGenerationLog.create({
+            data: {
+                userId: userIdForLimit,
+                ipAddress: ip,
+            }
+        });
+    } catch (dbError) {
+        console.error("Error accessing database for rate limit check:", dbError);
+        // We will optionally allow proceeding if DB fails, or we could block it. Let's block it for safety.
+        // Actually, if DB fails we probably should fail gracefully, but let's just log and proceed so we don't block totally on DB downtime.
+        // Or wait, throwing 500 might be safer.
+        return new Response(JSON.stringify({ error: 'Internal server error while checking AI rate limit.' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
+    // ----------------------------------------
 
     const { message, context } = await req.json();
 

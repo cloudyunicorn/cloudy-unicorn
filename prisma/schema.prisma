@@ -54,6 +54,7 @@ model User {
   goals           FitnessGoal[]     @default([])
   isSubscribed    Boolean?
   calorieLogs     CalorieLog[]
+  aiGenerationLogs AIGenerationLog[]
 
   @@index([email, createdAt])
 }
@@ -275,4 +276,15 @@ model CalorieLog {
 
   @@index([userId, date])
   @@index([userId, mealType])
+}
+
+model AIGenerationLog {
+  id        String   @id @default(uuid())
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  ipAddress String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([ipAddress, createdAt])
 }

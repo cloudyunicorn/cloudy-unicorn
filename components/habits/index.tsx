@@ -10,11 +10,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useData } from '@/contexts/DataContext';
+import { RateLimitAlert } from '@/components/ui/rate-limit-alert';
 
 const Habits = () => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [habitSuggestions, setHabitSuggestions] = useState('');
+  const [showRateLimitAlert, setShowRateLimitAlert] = useState(false);
+
   interface BodyMetrics {
     age?: number;
     weight?: number;
@@ -65,9 +68,13 @@ const Habits = () => {
       for await (const chunk of responseStream) {
         setHabitSuggestions((prev) => prev + chunk);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting habit suggestions:', error);
-      setHabitSuggestions('Failed to get suggestions. Please try again.');
+      if (error instanceof Error && error.message.includes('daily limit')) {
+        setShowRateLimitAlert(true);
+      } else {
+        setHabitSuggestions('Failed to get suggestions. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -162,6 +169,10 @@ const Habits = () => {
           )}
         </CardContent>
       </Card>
+      <RateLimitAlert
+        isOpen={showRateLimitAlert}
+        onClose={() => setShowRateLimitAlert(false)}
+      />
     </div>
   );
 };

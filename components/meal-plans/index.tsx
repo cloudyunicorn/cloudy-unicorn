@@ -13,11 +13,14 @@ import { saveMealPlan } from '@/lib/actions/user.action';
 import { useData } from '@/contexts/DataContext';
 import { MealPlansList, type MealPlan } from './MealPlansList';
 import { toast } from 'sonner';
+import { RateLimitAlert } from '@/components/ui/rate-limit-alert';
 
 const MealPlans = () => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [mealSuggestions, setMealSuggestions] = useState('');
+  const [showRateLimitAlert, setShowRateLimitAlert] = useState(false);
+
   interface BodyMetrics {
     age?: number;
     weight?: number;
@@ -54,7 +57,7 @@ const MealPlans = () => {
       const tags = context.diet.split(',')
         .map(t => t.trim())
         .filter(t => t !== '');
-      
+
       const result = await saveMealPlan(title, description, calories, tags);
       if (result.error) {
         toast.error('Failed to save meal plan');
@@ -97,9 +100,13 @@ const MealPlans = () => {
       for await (const chunk of responseStream) {
         setMealSuggestions((prev) => prev + chunk);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting meal suggestions:', error);
-      setMealSuggestions('Failed to get suggestions. Please try again.');
+      if (error instanceof Error && error.message.includes('daily limit')) {
+        setShowRateLimitAlert(true);
+      } else {
+        setMealSuggestions('Failed to get suggestions. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -118,9 +125,9 @@ const MealPlans = () => {
               id="diet"
               value={context.diet}
               onChange={(e) => {
-                setContext({ 
-                  ...context, 
-                  diet: e.target.value 
+                setContext({
+                  ...context,
+                  diet: e.target.value
                 });
               }}
               className="h-10"
@@ -155,13 +162,13 @@ const MealPlans = () => {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="flex justify-end mb-4">
-                    <Button 
-                      onClick={handleSavePlan}
-                      variant="outline"
-                      disabled={isSaving}
-                    >
-                      {isSaving ? 'Saving...' : 'Save Plan'}
-                    </Button>
+                  <Button
+                    onClick={handleSavePlan}
+                    variant="outline"
+                    disabled={isSaving}
+                  >
+                    {isSaving ? 'Saving...' : 'Save Plan'}
+                  </Button>
                 </div>
                 <div className="prose prose-sm max-w-none">
                   <ReactMarkdown
@@ -204,6 +211,10 @@ const MealPlans = () => {
       </Card>
 
       <MealPlansList onSave={refetch} />
+      <RateLimitAlert
+        isOpen={showRateLimitAlert}
+        onClose={() => setShowRateLimitAlert(false)}
+      />
     </div>
   );
 };

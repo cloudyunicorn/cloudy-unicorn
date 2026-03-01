@@ -20,12 +20,15 @@ import { saveWorkoutProgram } from '@/lib/actions/user.action';
 import { useData } from '@/contexts/DataContext';
 import { SavedWorkoutsList } from './SavedWorkoutsList';
 import { toast } from 'sonner';
+import { RateLimitAlert } from '@/components/ui/rate-limit-alert';
 
 const WorkoutPlans = () => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [workoutPlan, setWorkoutPlan] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [showRateLimitAlert, setShowRateLimitAlert] = useState(false);
+
   interface BodyMetrics {
     age?: number;
     weight?: number;
@@ -102,9 +105,13 @@ const WorkoutPlans = () => {
       for await (const chunk of responseStream) {
         setWorkoutPlan((prev) => prev + chunk);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting workout plan:', error);
-      setWorkoutPlan('Failed to get workout plan. Please try again.');
+      if (error instanceof Error && error.message.includes('daily limit')) {
+        setShowRateLimitAlert(true);
+      } else {
+        setWorkoutPlan('Failed to get workout plan. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -240,6 +247,10 @@ const WorkoutPlans = () => {
       </Card>
 
       <SavedWorkoutsList onSave={refetch} />
+      <RateLimitAlert
+        isOpen={showRateLimitAlert}
+        onClose={() => setShowRateLimitAlert(false)}
+      />
     </div>
   );
 };
