@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import prisma from "@/lib/prisma";
 import OpenAI from 'openai';
+import { z } from 'zod';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -71,14 +72,32 @@ export async function POST(req: NextRequest) {
     }
     // ----------------------------------------
 
-    const { message, context } = await req.json();
+    let body;
+    try {
+        body = await req.json();
+    } catch {
+        return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
+    }
 
-    if (!message || !context) {
-        return new Response(JSON.stringify({ error: 'Missing message or context' }), {
+    const aiChatSchema = z.object({
+        message: z.string().min(1, 'Message is required').max(2000, 'Message too long'),
+        context: z.object({
+            goals: z.array(z.string()).optional(),
+            diet: z.string().optional(),
+            fitnessLevel: z.string().optional(),
+            healthConditions: z.array(z.string()).optional()
+        }).default({})
+    });
+
+    const parsed = aiChatSchema.safeParse(body);
+    if (!parsed.success) {
+        return new Response(JSON.stringify({ error: 'Invalid request data', details: parsed.error.issues }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' },
         });
     }
+
+    const { message, context } = parsed.data;
 
     try {
         const stream = await openai.chat.completions.create({
